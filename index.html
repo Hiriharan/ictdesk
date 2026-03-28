@@ -552,7 +552,1040 @@ function showTab(name, el) {
   if (el) el.classList.add('active');
   if (name === 'chart') setTimeout(loadTVChart, 100);
   if (name === 'analyzer') updateApiIndicator();
+}<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ICT Desk — Trading Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0c0f;--bg2:#111318;--bg3:#191d24;--bg4:#1e2330;
+  --border:#2a2f3d;--border2:#363d50;
+  --text:#e8eaf0;--text2:#8b92a8;--text3:#555e75;
+  --gold:#d4a843;--gold2:#f0c060;--gold3:#7a5c1e;
+  --green:#3dbb7a;--red:#e05555;--blue:#4a9eff;--purple:#a78bfa;
 }
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;font-size:14px}
+.app{display:flex;flex-direction:column;min-height:100vh}
+
+/* HEADER */
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:100}
+.logo{font-family:'Space Mono',monospace;font-size:13px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
+.logo span{color:var(--text3);font-size:10px;margin-left:8px}
+.nav{display:flex;gap:4px;flex-wrap:wrap}
+.nav-btn{background:transparent;border:none;color:var(--text2);padding:6px 14px;cursor:pointer;font-family:'Syne',sans-serif;font-size:12px;letter-spacing:1px;border-radius:4px;transition:all 0.15s;text-transform:uppercase}
+.nav-btn:hover{color:var(--text);background:var(--bg3)}
+.nav-btn.active{color:var(--gold);background:var(--bg4);border:1px solid var(--gold3)}
+.header-right{display:flex;gap:8px;align-items:center}
+.settings-btn{background:transparent;border:1px solid var(--border2);color:var(--text3);padding:5px 12px;border-radius:4px;cursor:pointer;font-family:'Syne',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;transition:all 0.15s}
+.settings-btn:hover{border-color:var(--gold);color:var(--gold)}
+.api-indicator{width:8px;height:8px;border-radius:50%;background:var(--text3);display:inline-block;margin-right:4px}
+.api-indicator.set{background:var(--green)}
+
+/* CLOCK STRIP */
+.clock-strip{background:var(--bg3);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;gap:24px;align-items:center;font-family:'Space Mono',monospace;font-size:11px;flex-wrap:wrap}
+.session{display:flex;align-items:center;gap:8px}
+.session-dot{width:7px;height:7px;border-radius:50%;background:var(--text3)}
+.session-dot.live{background:var(--green)}
+.session-label{color:var(--text2)}
+.session-time{color:var(--text);font-weight:700}
+.session-status{font-size:10px;padding:2px 6px;border-radius:3px;background:var(--bg);color:var(--text3)}
+.session-status.live{background:rgba(61,187,122,0.15);color:var(--green)}
+
+/* CONTENT & TABS */
+.content{flex:1;padding:20px;max-width:1100px;margin:0 auto;width:100%}
+.tab{display:none}.tab.active{display:block}
+
+/* MODAL OVERLAY */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:24px;width:100%;max-width:480px;margin:20px}
+.modal-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase}
+.modal-sub{font-size:12px;color:var(--text3);margin-bottom:20px;line-height:1.6}
+.modal-close{float:right;background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer;margin-top:-4px}
+.modal-close:hover{color:var(--text)}
+.modal-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;display:block}
+.modal-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text);padding:9px 12px;font-family:'Space Mono',monospace;font-size:12px;margin-bottom:12px}
+.modal-input:focus{outline:none;border-color:var(--gold)}
+.modal-actions{display:flex;gap:8px;margin-top:4px}
+.modal-info{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px;font-size:11px;color:var(--text3);line-height:1.7;margin-top:16px}
+.modal-info a{color:var(--blue);text-decoration:none}
+.modal-info a:hover{text-decoration:underline}
+
+/* SESSIONS TAB */
+.sessions-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:20px}
+.sess-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.sess-card.live-card{border-color:var(--green);background:rgba(61,187,122,0.05)}
+.sess-card-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.sess-card-name{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
+.sess-card-time{font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)}
+.sess-card-countdown{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;margin-top:10px}
+.sess-card-countdown.live-count{color:var(--green)}
+.sess-card-countdown.wait-count{color:var(--gold)}
+.pairs-row{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.pair-tag{font-size:10px;padding:2px 8px;border-radius:3px;background:var(--bg3);color:var(--text2);border:1px solid var(--border);font-family:'Space Mono',monospace}
+.killzone-list{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.kz-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.kz-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)}
+.kz-row:last-child{border-bottom:none}
+.kz-name{color:var(--text);font-size:13px}
+.kz-time{font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)}
+.kz-dot{width:8px;height:8px;border-radius:50%;background:var(--text3);margin-right:8px;display:inline-block}
+.kz-dot.kz-live{background:var(--green)}.kz-dot.kz-close{background:var(--gold)}
+
+/* CONFLUENCE */
+.checklist-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.score-bar-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px}
+.score-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.score-bar{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.score-fill{height:100%;border-radius:3px;transition:width 0.4s}
+.score-fill.high{background:var(--green)}.score-fill.mid{background:var(--gold)}.score-fill.low{background:var(--red)}
+.score-num{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;color:var(--gold)}
+.score-num.high{color:var(--green)}.score-num.low{color:var(--red)}
+.verdict{font-size:12px;margin-top:4px;color:var(--text2)}
+.checklist-section{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;overflow:hidden}
+.checklist-section-header{padding:10px 14px;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);background:var(--bg3);border-bottom:1px solid var(--border)}
+.check-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s}
+.check-item:last-child{border-bottom:none}
+.check-item:hover{background:var(--bg3)}
+.check-box{width:18px;height:18px;border:1px solid var(--border2);border-radius:3px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.15s}
+.check-box.checked{background:var(--gold3);border-color:var(--gold)}
+.check-tick{color:var(--gold2);font-size:12px;display:none}
+.check-box.checked .check-tick{display:block}
+.check-label{flex:1;color:var(--text);font-size:13px}
+.check-weight{font-family:'Space Mono',monospace;font-size:11px;color:var(--text3)}
+
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:4px;font-family:'Syne',sans-serif;font-size:12px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:all 0.15s}
+.btn:hover{border-color:var(--gold);color:var(--gold)}
+.btn.primary{background:var(--gold3);border-color:var(--gold);color:var(--gold2)}
+.btn.primary:hover{background:var(--gold);color:var(--bg)}
+.btn.danger{border-color:rgba(224,85,85,0.4);color:var(--red)}
+.btn.danger:hover{background:rgba(224,85,85,0.1)}
+.btn.tv{background:rgba(74,158,255,0.08);border-color:rgba(74,158,255,0.4);color:var(--blue)}
+.btn.tv:hover{background:rgba(74,158,255,0.2)}
+.btn.pine{background:rgba(167,139,250,0.08);border-color:rgba(167,139,250,0.4);color:var(--purple)}
+.btn.pine:hover{background:rgba(167,139,250,0.2)}
+.tv-btn{font-size:10px;padding:3px 8px;background:rgba(74,158,255,0.08);border:1px solid rgba(74,158,255,0.3);color:var(--blue);border-radius:3px;cursor:pointer;font-family:'Syne',sans-serif;transition:all 0.15s;text-decoration:none;display:inline-block;letter-spacing:0.5px}
+.tv-btn:hover{background:rgba(74,158,255,0.2)}
+.cl-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+
+/* JOURNAL */
+.journal-top{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px}
+.stat-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.stat-val{font-size:22px;font-weight:700;font-family:'Space Mono',monospace}
+.stat-val.pos{color:var(--green)}.stat-val.neg{color:var(--red)}.stat-val.neu{color:var(--gold)}
+.journal-toolbar{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}
+.pair-pill{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-family:'Space Mono',monospace;transition:all 0.15s}
+.pair-pill.active-filter{background:var(--gold3);border-color:var(--gold);color:var(--gold2)}
+.pair-mgr-btn{margin-left:auto;font-size:11px;padding:4px 12px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:1px;text-transform:uppercase;transition:all 0.15s}
+.pair-mgr-btn:hover{border-color:var(--gold);color:var(--gold)}
+.pair-mgr-panel{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:16px;margin-bottom:14px;display:none}
+.pair-mgr-panel.open{display:block}
+.pair-mgr-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.pair-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.pair-chip{display:flex;align-items:center;gap:6px;font-size:11px;padding:5px 10px;border-radius:4px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:'Space Mono',monospace}
+.pair-chip-remove{cursor:pointer;color:var(--red);font-size:14px;line-height:1;background:none;border:none;padding:0;font-family:monospace}
+.pair-add-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pair-input{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:6px 10px;font-family:'Space Mono',monospace;font-size:12px;text-transform:uppercase;width:120px}
+.pair-input:focus{outline:none;border-color:var(--gold)}
+.add-trade-btn{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;cursor:pointer;color:var(--gold);font-size:13px;margin-bottom:16px;transition:all 0.15s;font-family:'Syne',sans-serif;letter-spacing:1px;width:100%}
+.add-trade-btn:hover{border-color:var(--gold);background:var(--bg4)}
+.add-form{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:16px;margin-bottom:16px;display:none}
+.add-form.open{display:block}
+.form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3)}
+.form-input{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:7px 10px;font-family:'Syne',sans-serif;font-size:13px}
+.form-input:focus{outline:none;border-color:var(--gold)}
+.form-select{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:7px 10px;font-family:'Syne',sans-serif;font-size:13px;cursor:pointer}
+.form-textarea{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:7px 10px;font-family:'Syne',sans-serif;font-size:13px;resize:vertical;min-height:60px}
+.form-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.trade-log{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;overflow-x:auto}
+.log-table{width:100%;border-collapse:collapse;min-width:700px}
+.log-table th{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:10px 12px;background:var(--bg3);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.log-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-family:'Space Mono',monospace;font-size:11px;color:var(--text);vertical-align:middle}
+.log-table tr:last-child td{border-bottom:none}
+.log-table tr:hover td{background:var(--bg3)}
+.log-cell-pair{color:var(--gold2);font-weight:700}
+.log-cell-win{color:var(--green)}.log-cell-loss{color:var(--red)}.log-cell-be{color:var(--text2)}
+.dir-tag{font-size:10px;padding:2px 7px;border-radius:3px}
+.dir-long{background:rgba(61,187,122,0.15);color:var(--green)}
+.dir-short{background:rgba(224,85,85,0.15);color:var(--red)}
+.notes-cell{font-size:11px;color:var(--text3);font-family:'Syne',sans-serif;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-btns{display:flex;gap:4px}
+.ai-btn{font-size:10px;padding:3px 8px;background:var(--bg4);border:1px solid var(--gold3);color:var(--gold);border-radius:3px;cursor:pointer;font-family:'Syne',sans-serif;transition:all 0.15s;white-space:nowrap}
+.ai-btn:hover{background:var(--gold3)}
+.del-btn{font-size:10px;padding:3px 7px;background:transparent;border:1px solid rgba(224,85,85,0.3);color:var(--red);border-radius:3px;cursor:pointer;font-family:'Syne',sans-serif;transition:all 0.15s}
+.del-btn:hover{background:rgba(224,85,85,0.1)}
+.empty-log{padding:32px;text-align:center;color:var(--text3);font-size:13px}
+
+/* AI ANALYZER */
+.analyzer-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.analyzer-layout{grid-template-columns:1fr}}
+.ai-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.ai-panel-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px}
+.setup-fields{display:flex;flex-direction:column;gap:10px}
+.inline-select{background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:7px 10px;font-family:'Syne',sans-serif;font-size:13px;width:100%;cursor:pointer}
+.tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.tag-toggle{font-size:11px;padding:4px 10px;border-radius:3px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-family:'Space Mono',monospace;transition:all 0.15s}
+.tag-toggle.on{background:var(--gold3);border-color:var(--gold);color:var(--gold2)}
+.screenshot-zone{border:1px dashed var(--border2);border-radius:6px;padding:14px;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--bg3)}
+.screenshot-zone:hover{border-color:var(--gold)}
+.screenshot-previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.screenshot-thumb{position:relative;width:72px;height:54px;border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.screenshot-thumb img{width:100%;height:100%;object-fit:cover}
+.thumb-remove{position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,0.75);border:none;color:var(--red);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.analyze-btn{width:100%;margin-top:12px;padding:10px;background:var(--gold3);border:1px solid var(--gold);color:var(--gold2);border-radius:4px;font-family:'Syne',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.15s}
+.analyze-btn:hover{background:var(--gold);color:var(--bg)}
+.analyze-btn:disabled{opacity:0.5;cursor:not-allowed}
+.ai-output{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px;min-height:140px;font-size:13px;color:var(--text2);line-height:1.7}
+.ai-score-badge{padding:6px 14px;border-radius:4px;font-size:11px;font-family:'Space Mono',monospace;letter-spacing:1px}
+.badge-A{background:rgba(61,187,122,0.2);color:var(--green);border:1px solid var(--green)}
+.badge-B{background:rgba(212,168,67,0.2);color:var(--gold);border:1px solid var(--gold3)}
+.badge-C{background:rgba(224,85,85,0.2);color:var(--red);border:1px solid var(--red)}
+.ai-thinking{color:var(--text3);font-style:italic;font-family:'Space Mono',monospace;font-size:12px}
+.ai-thinking::after{content:'...';animation:dots 1.2s steps(3,end) infinite}
+@keyframes dots{0%{content:''}33%{content:'.'}66%{content:'..'}100%{content:'...'}}
+.no-api-warn{background:rgba(224,85,85,0.08);border:1px solid rgba(224,85,85,0.3);border-radius:6px;padding:12px;font-size:12px;color:var(--red);line-height:1.6;margin-bottom:12px}
+.no-api-warn button{background:none;border:none;color:var(--gold);cursor:pointer;font-family:'Syne',sans-serif;font-size:12px;text-decoration:underline;padding:0}
+
+/* LIVE CHART */
+.tv-chart-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.tv-chart-toolbar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg3);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.tv-chart-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3)}
+.tv-chart-container{height:460px;background:var(--bg)}
+.tf-pill{font-size:11px;padding:3px 10px;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;font-family:'Space Mono',monospace;transition:all 0.15s}
+.tf-pill.active{background:var(--bg4);border-color:var(--gold);color:var(--gold)}
+
+/* PINE */
+.pine-section{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:700px){.pine-section{grid-template-columns:1fr}}
+.pine-options{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.pine-opt{font-size:11px;padding:4px 10px;border-radius:3px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);cursor:pointer;font-family:'Space Mono',monospace;transition:all 0.15s}
+.pine-opt.on{background:rgba(167,139,250,0.15);border-color:var(--purple);color:var(--purple)}
+.pine-code{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px;font-family:'Space Mono',monospace;font-size:11px;color:#9cdcfe;line-height:1.7;white-space:pre;overflow-x:auto;max-height:380px;overflow-y:auto;margin-top:12px}
+.pine-code .kw{color:#569cd6}.pine-code .fn{color:#dcdcaa}.pine-code .str{color:#ce9178}.pine-code .cmt{color:#6a9955}.pine-code .num{color:#b5cea8}
+.copy-btn{font-size:11px;padding:5px 12px;border-radius:4px;border:1px solid rgba(167,139,250,0.4);background:rgba(167,139,250,0.1);color:var(--purple);cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:1px;text-transform:uppercase;transition:all 0.15s}
+.copy-btn:hover{background:rgba(167,139,250,0.25)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--border2);border-radius:6px;padding:10px 16px;font-size:12px;color:var(--text);z-index:999;transform:translateY(60px);opacity:0;transition:all 0.25s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{border-color:var(--green);color:var(--green)}
+.toast.error{border-color:var(--red);color:var(--red)}
+
+@media(max-width:600px){
+  .form-grid{grid-template-columns:1fr 1fr}
+  .journal-top{grid-template-columns:1fr 1fr}
+  .nav-btn{font-size:11px;padding:5px 10px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">ICT Desk <span>+ TradingView</span></div>
+  <div class="nav">
+    <button class="nav-btn active" onclick="showTab('sessions',this)">Sessions</button>
+    <button class="nav-btn" onclick="showTab('checklist',this)">Confluence</button>
+    <button class="nav-btn" onclick="showTab('journal',this)">Journal</button>
+    <button class="nav-btn" onclick="showTab('analyzer',this)">AI Analyzer</button>
+    <button class="nav-btn" onclick="showTab('chart',this)">Live Chart</button>
+    <button class="nav-btn" onclick="showTab('pine',this)">Pine Script</button>
+  </div>
+  <div class="header-right">
+    <span id="api-dot" class="api-indicator"></span>
+    <button class="settings-btn" onclick="openSettings()">Settings</button>
+  </div>
+</div>
+
+<!-- CLOCK STRIP -->
+<div class="clock-strip">
+  <div class="session"><span class="session-dot" id="syd-dot"></span><span class="session-label">SYD</span><span class="session-time" id="syd-time">--:--</span><span class="session-status" id="syd-status">closed</span></div>
+  <div class="session"><span class="session-dot" id="lon-dot"></span><span class="session-label">LON</span><span class="session-time" id="lon-time">--:--</span><span class="session-status" id="lon-status">closed</span></div>
+  <div class="session"><span class="session-dot" id="ny-dot"></span><span class="session-label">NY</span><span class="session-time" id="ny-time">--:--</span><span class="session-status" id="ny-status">closed</span></div>
+  <div style="margin-left:auto;font-size:11px;color:var(--text3)" id="utc-time"></div>
+</div>
+
+<!-- WEEKEND BANNER -->
+<div id="weekend-banner" style="display:none;background:rgba(212,168,67,0.08);border-bottom:1px solid rgba(212,168,67,0.25);padding:10px 20px;text-align:center;font-family:'Space Mono',monospace;font-size:12px;color:var(--gold)">
+  MARKETS CLOSED &nbsp;·&nbsp; Weekend &nbsp;·&nbsp; <span id="next-open-msg" style="color:var(--text2)"></span>
+</div>
+
+<!-- SESSIONS TAB -->
+<div class="content tab active" id="tab-sessions">
+  <div class="sessions-grid" id="sessions-grid"></div>
+  <div class="killzone-list"><div class="kz-title">ICT Kill Zones &amp; High-Impact Windows</div><div id="kz-list"></div></div>
+</div>
+
+<!-- CONFLUENCE TAB -->
+<div class="content tab" id="tab-checklist">
+  <div class="checklist-header">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <select class="form-select" id="cl-pair" onchange="saveState();updateScore()"></select>
+      <span style="font-size:11px;color:var(--text3);font-family:'Space Mono',monospace" id="cl-bias"></span>
+    </div>
+    <a href="#" class="tv-btn" onclick="openTV(document.getElementById('cl-pair').value,'15');return false">Open in TV</a>
+  </div>
+  <div class="score-bar-wrap">
+    <div class="score-label">Confluence Score</div>
+    <div class="score-bar"><div class="score-fill" id="score-fill" style="width:0%"></div></div>
+    <div style="display:flex;align-items:baseline;gap:10px">
+      <span class="score-num" id="score-num">0</span>
+      <span style="font-size:13px;color:var(--text3)">/</span>
+      <span style="font-size:13px;color:var(--text3)" id="score-max">10</span>
+      <span class="verdict" id="verdict-text">Check your confluences before entering</span>
+    </div>
+  </div>
+  <div id="checklist-body"></div>
+  <div class="cl-actions">
+    <button class="btn" onclick="resetChecklist()">Reset</button>
+    <button class="btn primary" onclick="sendChecklistToAI()">Analyze with AI</button>
+  </div>
+</div>
+
+<!-- JOURNAL TAB -->
+<div class="content tab" id="tab-journal">
+  <div class="journal-top" id="journal-stats"></div>
+  <div class="journal-toolbar">
+    <span style="font-size:11px;color:var(--text3);letter-spacing:1px;text-transform:uppercase">Filter:</span>
+    <span class="pair-pill active-filter" data-pair="ALL" onclick="filterPair(this)">All</span>
+    <span id="filter-pills"></span>
+    <button class="pair-mgr-btn" onclick="togglePairMgr()">Manage Pairs</button>
+  </div>
+  <div class="pair-mgr-panel" id="pair-mgr">
+    <div class="pair-mgr-title">Active Pairs</div>
+    <div class="pair-chips" id="pair-chips"></div>
+    <div class="pair-add-row">
+      <input class="pair-input" id="new-pair-input" placeholder="e.g. BTCUSD" maxlength="10" oninput="this.value=this.value.toUpperCase()">
+      <button class="btn primary" onclick="addPair()">Add Pair</button>
+      <span style="font-size:11px;color:var(--red);margin-left:4px" id="pair-err"></span>
+    </div>
+  </div>
+  <button class="add-trade-btn" onclick="toggleForm()">+ Log New Trade</button>
+  <div class="add-form" id="add-form">
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Pair</label><select class="form-select" id="f-pair"></select></div>
+      <div class="form-group"><label class="form-label">Direction</label><select class="form-select" id="f-dir"><option>Long</option><option>Short</option></select></div>
+      <div class="form-group"><label class="form-label">Session</label><select class="form-select" id="f-sess"><option>London</option><option>New York</option><option>Asian</option><option>Silver Bullet</option></select></div>
+      <div class="form-group"><label class="form-label">Entry</label><input class="form-input" id="f-entry" type="number" step="0.00001" placeholder="0.00000"></div>
+      <div class="form-group"><label class="form-label">Stop Loss</label><input class="form-input" id="f-sl" type="number" step="0.00001" placeholder="0.00000"></div>
+      <div class="form-group"><label class="form-label">Take Profit</label><input class="form-input" id="f-tp" type="number" step="0.00001" placeholder="0.00000"></div>
+      <div class="form-group"><label class="form-label">Result</label><select class="form-select" id="f-result"><option>Win</option><option>Loss</option><option>BE</option></select></div>
+      <div class="form-group"><label class="form-label">R:R (auto)</label><input class="form-input" id="f-rr" type="number" step="0.1" placeholder="2.5"></div>
+      <div class="form-group"><label class="form-label">R Gained/Lost</label><input class="form-input" id="f-r" type="number" step="0.1" placeholder="2.5"></div>
+    </div>
+    <div class="form-group" style="margin-bottom:10px"><label class="form-label">Setup / Notes</label>
+      <textarea class="form-textarea" id="f-notes" placeholder="e.g. FVG entry on 15m, OTE, London KZ, swept buy-side liq..."></textarea></div>
+    <div class="form-actions">
+      <button class="btn primary" onclick="logTrade()">Log Trade</button>
+      <button class="btn" onclick="toggleForm()">Cancel</button>
+      <button class="btn danger" onclick="clearAllTrades()" style="margin-left:auto">Clear All</button>
+    </div>
+  </div>
+  <div class="trade-log">
+    <table class="log-table">
+      <thead><tr>
+        <th>Date</th><th>Pair</th><th>Dir</th><th>Session</th><th>R:R</th><th>Result</th><th>Notes</th><th>Actions</th>
+      </tr></thead>
+      <tbody id="trade-log-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- AI ANALYZER TAB -->
+<div class="content tab" id="tab-analyzer">
+  <div id="no-api-banner" class="no-api-warn" style="display:none">
+    No API key set. AI analysis requires your Anthropic API key. <button onclick="openSettings()">Add API Key →</button>
+  </div>
+  <div class="analyzer-layout">
+    <div class="ai-panel">
+      <div class="ai-panel-title">Setup Input</div>
+      <div class="setup-fields">
+        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end">
+          <div class="form-group"><label class="form-label">Pair</label><select class="inline-select" id="ai-pair"></select></div>
+          <a href="#" class="tv-btn" style="padding:7px 12px;white-space:nowrap" onclick="openTV(document.getElementById('ai-pair').value,document.getElementById('ai-tf').value);return false">Open in TV</a>
+        </div>
+        <div class="form-group"><label class="form-label">Timeframe</label>
+          <select class="inline-select" id="ai-tf"><option>1D</option><option>4H</option><option>1H</option><option selected>15M</option><option>5M</option><option>1M</option></select></div>
+        <div class="form-group"><label class="form-label">Bias</label>
+          <select class="inline-select" id="ai-bias"><option>Bullish</option><option>Bearish</option><option>Neutral</option></select></div>
+        <div class="form-group"><label class="form-label">Session</label>
+          <select class="inline-select" id="ai-sess"><option>London Open</option><option>NY Open</option><option>Silver Bullet</option><option>NY PM</option><option>Asian</option></select></div>
+        <div class="form-group"><label class="form-label">ICT Confluences</label>
+          <div class="tag-row" id="ict-tags">
+            <span class="tag-toggle" onclick="toggleTag(this)">FVG</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">OB</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">Liq Sweep</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">BOS</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">CHoCH</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">OTE</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">SMT Div</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">NWOG</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">Kill Zone</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">Equilibrium</span>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Additional Context</label>
+          <textarea class="form-textarea" id="ai-context" placeholder="Price swept high, reacted off 15M FVG, waiting for displacement..."></textarea></div>
+        <div class="form-group">
+          <label class="form-label">Chart Screenshots (up to 5)</label>
+          <div class="screenshot-zone" id="drop-zone" onclick="document.getElementById('ss-input').click()"
+            ondragover="event.preventDefault();this.style.borderColor='var(--gold)'"
+            ondragleave="this.style.borderColor=''"
+            ondrop="handleDrop(event)">
+            <div style="font-size:12px;color:var(--text3);margin-bottom:3px">Drop charts here or click to upload</div>
+            <div style="font-size:11px;color:var(--text3)">PNG / JPG / WEBP</div>
+          </div>
+          <input type="file" id="ss-input" accept="image/*" multiple style="display:none" onchange="handleFiles(this.files)">
+          <div class="screenshot-previews" id="ss-previews"></div>
+          <div id="ss-count" style="font-size:11px;color:var(--gold);margin-top:6px;font-family:'Space Mono',monospace"></div>
+        </div>
+      </div>
+      <button class="analyze-btn" id="analyze-btn" onclick="analyzeSetup()">Analyze Setup with AI</button>
+    </div>
+    <div class="ai-panel">
+      <div class="ai-panel-title">AI Analysis</div>
+      <div id="ai-input-summary" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap"></div>
+      <div class="ai-output" id="ai-output"><span style="color:var(--text3)">Fill in your setup details and click Analyze to get ICT-focused feedback.</span></div>
+      <div id="ai-badges" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE CHART TAB -->
+<div class="content tab" id="tab-chart">
+  <div class="tv-chart-panel">
+    <div class="tv-chart-toolbar">
+      <span class="tv-chart-title">Live Chart</span>
+      <select id="chart-pair-sel" class="form-select" style="width:130px;padding:5px 8px;font-size:12px" onchange="loadTVChart()"></select>
+      <div style="display:flex;gap:4px;flex-wrap:wrap">
+        <span class="tf-pill active" data-tf="1" onclick="setChartTF(this,'1')">1M</span>
+        <span class="tf-pill" data-tf="5" onclick="setChartTF(this,'5')">5M</span>
+        <span class="tf-pill" data-tf="15" onclick="setChartTF(this,'15')">15M</span>
+        <span class="tf-pill" data-tf="60" onclick="setChartTF(this,'60')">1H</span>
+        <span class="tf-pill" data-tf="240" onclick="setChartTF(this,'240')">4H</span>
+        <span class="tf-pill" data-tf="D" onclick="setChartTF(this,'D')">1D</span>
+      </div>
+      <a href="#" class="tv-btn" style="margin-left:auto" onclick="openTV(document.getElementById('chart-pair-sel').value,currentTF);return false">Open Full Chart in TV</a>
+    </div>
+    <div class="tv-chart-container" id="tv-chart-container"></div>
+  </div>
+</div>
+
+<!-- PINE SCRIPT TAB -->
+<div class="content tab" id="tab-pine">
+  <div class="pine-section">
+    <div class="ai-panel">
+      <div class="ai-panel-title">Alert Configuration</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="form-group"><label class="form-label">Pair</label><select class="inline-select" id="pine-pair"></select></div>
+        <div class="form-group"><label class="form-label">Alert on these conditions</label>
+          <div class="pine-options" id="pine-opts">
+            <span class="pine-opt on" onclick="togglePineOpt(this)">Kill Zone Active</span>
+            <span class="pine-opt on" onclick="togglePineOpt(this)">FVG Formed</span>
+            <span class="pine-opt on" onclick="togglePineOpt(this)">Session Open</span>
+            <span class="pine-opt" onclick="togglePineOpt(this)">OB Identified</span>
+            <span class="pine-opt" onclick="togglePineOpt(this)">Liquidity Sweep</span>
+            <span class="pine-opt" onclick="togglePineOpt(this)">BOS / CHoCH</span>
+            <span class="pine-opt" onclick="togglePineOpt(this)">OTE Zone</span>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">Bias Filter</label>
+          <select class="inline-select" id="pine-bias">
+            <option value="both">Both directions</option>
+            <option value="bull">Bullish only</option>
+            <option value="bear">Bearish only</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Webhook Alert Message</label>
+          <input class="form-input" id="pine-msg" value='{"pair":"{{ticker}}","alert":"ICT Setup","price":"{{close}}","time":"{{time}}"}'>
+        </div>
+      </div>
+      <button class="btn pine" style="width:100%;margin-top:14px;padding:10px;font-size:12px;letter-spacing:2px;text-transform:uppercase" onclick="generatePine()">Generate Pine Script</button>
+    </div>
+    <div class="ai-panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span class="ai-panel-title" style="margin-bottom:0">Generated Script</span>
+        <button class="copy-btn" onclick="copyPine()">Copy</button>
+      </div>
+      <div class="pine-code" id="pine-output">Select conditions and click Generate.</div>
+      <div style="margin-top:12px;font-size:11px;color:var(--text3);line-height:1.7">
+        Paste into TradingView Pine Editor → Add to chart → Create alert → condition: "ICT Alert Triggered" → enable webhook URL.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeSettings()">×</button>
+    <div class="modal-title">Settings</div>
+    <div class="modal-sub">Your API key is stored locally in your browser only — never sent to any server other than Anthropic directly.</div>
+    <label class="modal-label">Anthropic API Key</label>
+    <input class="modal-input" type="password" id="api-key-input" placeholder="sk-ant-...">
+    <div class="modal-actions">
+      <button class="btn primary" onclick="saveApiKey()">Save Key</button>
+      <button class="btn danger" onclick="clearApiKey()">Remove Key</button>
+    </div>
+    <div class="modal-info">
+      Don't have an API key? Get one free at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.
+      The AI Analyzer uses claude-sonnet-4-20250514. Typical analysis costs ~0.01 USD per request.
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────────────────────────────
+const DEFAULT_PAIRS = ['XAUUSD','AUDUSD','USDJPY','EURUSD','GBPUSD'];
+let pairs = JSON.parse(localStorage.getItem('ict_pairs') || JSON.stringify(DEFAULT_PAIRS));
+let trades = JSON.parse(localStorage.getItem('ict_trades') || '[]');
+let checkState = JSON.parse(localStorage.getItem('ict_checks') || '{}');
+let screenshots = [];
+let filterActive = 'ALL';
+let currentTF = '1';
+let formOpen = false;
+
+function saveState() {
+  localStorage.setItem('ict_pairs', JSON.stringify(pairs));
+  localStorage.setItem('ict_trades', JSON.stringify(trades));
+  localStorage.setItem('ict_checks', JSON.stringify(checkState));
+}
+
+// ─── API KEY ─────────────────────────────────────────────────────────────────
+function getApiKey() { return localStorage.getItem('ict_api_key') || ''; }
+function saveApiKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  if (!val) { showToast('Enter a key first', 'error'); return; }
+  localStorage.setItem('ict_api_key', val);
+  updateApiIndicator();
+  closeSettings();
+  showToast('API key saved', 'success');
+}
+function clearApiKey() {
+  localStorage.removeItem('ict_api_key');
+  document.getElementById('api-key-input').value = '';
+  updateApiIndicator();
+  showToast('API key removed');
+}
+function updateApiIndicator() {
+  const dot = document.getElementById('api-dot');
+  const has = !!getApiKey();
+  dot.className = 'api-indicator' + (has ? ' set' : '');
+  const banner = document.getElementById('no-api-banner');
+  if (banner) banner.style.display = has ? 'none' : 'block';
+}
+function openSettings() {
+  document.getElementById('api-key-input').value = getApiKey();
+  document.getElementById('settings-modal').classList.add('open');
+}
+function closeSettings() { document.getElementById('settings-modal').classList.remove('open'); }
+document.getElementById('settings-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeSettings(); });
+
+// ─── TOAST ────────────────────────────────────────────────────────────────────
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(() => t.className = 'toast', 2800);
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function showTab(name, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (el) el.classList.add('active');
+  if (name === 'chart') setTimeout(loadTVChart, 100);
+  if (name === 'analyzer') updateApiIndicator();
+}
+
+// ─── SESSIONS & CLOCKS ───────────────────────────────────────────────────────
+const SESSIONS = [
+  {name:'Asian',start:22,end:7,pairs:['USDJPY','AUDUSD'],desc:'Range setting, liquidity build'},
+  {name:'London',start:8,end:16,pairs:['EURUSD','GBPUSD','XAUUSD'],desc:'Primary trend, high volatility'},
+  {name:'New York',start:13,end:21,pairs:['XAUUSD','EURUSD','GBPUSD','USDJPY'],desc:'Continuation or reversal'},
+];
+const KILL_ZONES = [
+  {name:'Asian KZ',start:22,end:1},{name:'London Open KZ',start:8,end:10},
+  {name:'London Close KZ',start:11,end:13},{name:'NY Open KZ',start:13,end:15},
+  {name:'Silver Bullet (NY)',start:15,end:16},{name:'NY PM',start:19,end:21},
+];
+
+function inSession(s, e, h) { return s < e ? h >= s && h < e : h >= s || h < e; }
+function getUTCHour() { const n = new Date(); return n.getUTCHours() + (n.getUTCMinutes() / 60); }
+function secsUntil(t) {
+  const n = new Date();
+  let d = t * 3600 - (n.getUTCHours() * 3600 + n.getUTCMinutes() * 60 + n.getUTCSeconds());
+  if (d < 0) d += 86400; return d;
+}
+function fmtCD(s) {
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sc = s % 60;
+  return h > 0 ? `${h}h ${String(m).padStart(2,'0')}m` : `${String(m).padStart(2,'0')}m ${String(sc).padStart(2,'0')}s`;
+}
+function pad(n) { return String(n).padStart(2,'0'); }
+
+function checkWeekend() {
+  const now = new Date();
+  const day = now.getUTCDay(); // 0=Sun, 6=Sat
+  const hour = now.getUTCHours();
+  // Market closed: Sat 00:00 UTC through Sun 21:00 UTC
+  const isWeekend = day === 6 || (day === 0 && hour < 21) || (day === 5 && hour >= 22 && false);
+  const banner = document.getElementById('weekend-banner');
+  const msg = document.getElementById('next-open-msg');
+  if (isWeekend) {
+    banner.style.display = 'block';
+    // Calculate time until Sunday 21:00 UTC (Sydney open)
+    const target = new Date(now);
+    if (day === 6) { target.setUTCDate(target.getUTCDate() + (7 - day)); }
+    else if (day === 0) { target.setUTCDate(target.getUTCDate()); }
+    target.setUTCHours(21, 0, 0, 0);
+    if (day === 0 && hour >= 21) { banner.style.display = 'none'; return; }
+    const diff = Math.max(0, target - now);
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    msg.textContent = `Sydney open (Asian session) in ${h}h ${String(m).padStart(2,'0')}m — Monday London at UTC 08:00`;
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function updateClocks() {
+  const now = new Date();
+  const fmt = (h, m) => `${pad(h)}:${pad(m)}`;
+  const syd = new Date(now.getTime() + (11 * 3600000));
+  const lon = new Date(now);
+  const ny = new Date(now.getTime() + (-5 * 3600000));
+  document.getElementById('syd-time').textContent = fmt(syd.getUTCHours(), syd.getUTCMinutes());
+  document.getElementById('lon-time').textContent = fmt(lon.getUTCHours(), lon.getUTCMinutes());
+  document.getElementById('ny-time').textContent = fmt(ny.getUTCHours(), ny.getUTCMinutes());
+  document.getElementById('utc-time').textContent = 'UTC ' + fmt(now.getUTCHours(), now.getUTCMinutes()) + ':' + pad(now.getUTCSeconds());
+  const h = getUTCHour();
+  [['lon', inSession(8,16,h)], ['ny', inSession(13,21,h)], ['syd', inSession(22,7,h)]].forEach(([id, live]) => {
+    document.getElementById(id + '-dot').className = 'session-dot' + (live ? ' live' : '');
+    document.getElementById(id + '-status').className = 'session-status' + (live ? ' live' : '');
+    document.getElementById(id + '-status').textContent = live ? 'LIVE' : 'closed';
+  });
+  updateSessionCards(h);
+}
+
+function updateSessionCards(h) {
+  const grid = document.getElementById('sessions-grid'); grid.innerHTML = '';
+  SESSIONS.forEach(s => {
+    const live = inSession(s.start, s.end, h);
+    const card = document.createElement('div'); card.className = 'sess-card' + (live ? ' live-card' : '');
+    const cd = live
+      ? `<div class="sess-card-countdown live-count">${fmtCD(secsUntil(s.end))} left</div>`
+      : `<div class="sess-card-countdown wait-count">Opens in ${fmtCD(secsUntil(s.start))}</div>`;
+    card.innerHTML = `<div class="sess-card-label">${live ? '● LIVE' : 'upcoming'}</div>
+      <div class="sess-card-name">${s.name}</div>
+      <div class="sess-card-time">UTC ${s.start}:00–${s.end}:00 · ${s.desc}</div>
+      ${cd}<div class="pairs-row">${s.pairs.map(p => `<span class="pair-tag">${p}</span>`).join('')}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+function buildKillZones() {
+  const h = getUTCHour(); const list = document.getElementById('kz-list'); list.innerHTML = '';
+  KILL_ZONES.forEach(kz => {
+    const live = inSession(kz.start, kz.end, h), upcoming = !live && secsUntil(kz.start) < 7200;
+    const row = document.createElement('div'); row.className = 'kz-row';
+    row.innerHTML = `<span><span class="kz-dot${live ? ' kz-live' : upcoming ? ' kz-close' : ''}"></span>
+      <span class="kz-name">${kz.name}</span></span>
+      <span class="kz-time">UTC ${pad(kz.start)}:00–${pad(kz.end)}:00
+      ${live ? '<span class="session-status live">LIVE</span>' : upcoming ? '<span class="session-status" style="color:var(--gold)">SOON</span>' : ''}</span>`;
+    list.appendChild(row);
+  });
+}
+
+// ─── PAIRS ────────────────────────────────────────────────────────────────────
+const TV_SYMBOL_MAP = {XAUUSD:'OANDA:XAUUSD',AUDUSD:'OANDA:AUDUSD',USDJPY:'OANDA:USDJPY',EURUSD:'OANDA:EURUSD',GBPUSD:'OANDA:GBPUSD',BTCUSD:'COINBASE:BTCUSD',ETHUSD:'COINBASE:ETHUSD'};
+const TV_TF_MAP = {'1M':'1','5M':'5','15M':'15','1H':'60','4H':'240','1D':'D'};
+function tvSymbol(p) { return TV_SYMBOL_MAP[p] || (p.length === 6 ? 'FX:' + p : p); }
+function openTV(pair, tf) {
+  const sym = encodeURIComponent(tvSymbol(pair));
+  const interval = TV_TF_MAP[tf] || tf || '15';
+  window.open('https://www.tradingview.com/chart/?symbol=' + sym + '&interval=' + interval, '_blank');
+}
+
+function populatePairSelects() {
+  ['cl-pair','f-pair','ai-pair','chart-pair-sel','pine-pair'].forEach(id => {
+    const el = document.getElementById(id); if (!el) return;
+    const cur = el.value; el.innerHTML = '';
+    pairs.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; el.appendChild(o); });
+    if (pairs.includes(cur)) el.value = cur;
+  });
+  renderFilterPills(); renderPairChips();
+}
+
+function renderFilterPills() {
+  const cont = document.getElementById('filter-pills'); cont.innerHTML = '';
+  pairs.forEach(p => {
+    const span = document.createElement('span');
+    span.className = 'pair-pill' + (filterActive === p ? ' active-filter' : '');
+    span.dataset.pair = p; span.textContent = p;
+    span.onclick = () => filterPair(span); cont.appendChild(span);
+  });
+}
+
+function renderPairChips() {
+  const cont = document.getElementById('pair-chips'); cont.innerHTML = '';
+  pairs.forEach(p => {
+    const chip = document.createElement('div'); chip.className = 'pair-chip';
+    chip.innerHTML = `${p}<button class="pair-chip-remove" onclick="removePair('${p}')">×</button>`;
+    cont.appendChild(chip);
+  });
+}
+
+function togglePairMgr() {
+  const p = document.getElementById('pair-mgr');
+  p.className = 'pair-mgr-panel' + (p.className.includes('open') ? '' : ' open');
+}
+
+function addPair() {
+  const input = document.getElementById('new-pair-input'), val = input.value.trim().toUpperCase();
+  const err = document.getElementById('pair-err');
+  if (!val || val.length < 3) { err.textContent = 'Too short'; return; }
+  if (pairs.includes(val)) { err.textContent = 'Already exists'; return; }
+  pairs.push(val); err.textContent = ''; input.value = '';
+  saveState(); populatePairSelects(); showToast(val + ' added', 'success');
+}
+
+function removePair(p) {
+  if (pairs.length <= 1) { showToast('Keep at least 1 pair', 'error'); return; }
+  pairs = pairs.filter(x => x !== p);
+  if (filterActive === p) filterActive = 'ALL';
+  saveState(); populatePairSelects(); renderJournal();
+  showToast(p + ' removed');
+}
+
+function filterPair(el) {
+  filterActive = el.dataset.pair;
+  document.querySelectorAll('.pair-pill').forEach(p => p.classList.remove('active-filter'));
+  el.classList.add('active-filter'); renderJournal();
+}
+
+// ─── CONFLUENCE CHECKLIST ─────────────────────────────────────────────────────
+const CHECKS = [
+  {section:'Market Structure',items:[
+    {label:'HTF Trend aligns (Weekly/Daily)',w:2},
+    {label:'BOS or CHoCH confirmed on LTF',w:2},
+    {label:'Price at Premium/Discount (50%+ Fib)',w:1}
+  ]},
+  {section:'Liquidity',items:[
+    {label:'Liquidity sweep on recent high/low',w:2},
+    {label:'Price approaching next draw on liquidity',w:1}
+  ]},
+  {section:'Entry Model',items:[
+    {label:'FVG or Order Block identified',w:2},
+    {label:'OTE (61.8–79% retracement)',w:1},
+    {label:'SMT Divergence present',w:1}
+  ]},
+  {section:'Session & Time',items:[
+    {label:'Inside active kill zone',w:2},
+    {label:'News/high-impact events avoided',w:1}
+  ]},
+];
+let checkItems = [];
+
+function buildChecklist() {
+  checkItems = []; const body = document.getElementById('checklist-body'); body.innerHTML = '';
+  CHECKS.forEach(sec => {
+    const se = document.createElement('div'); se.className = 'checklist-section';
+    se.innerHTML = `<div class="checklist-section-header">${sec.section}</div>`;
+    sec.items.forEach(item => {
+      const idx = checkItems.length;
+      const saved = checkState[item.label] || false;
+      checkItems.push({...item, checked: saved});
+      const row = document.createElement('div'); row.className = 'check-item';
+      row.onclick = () => toggleCheck(idx, row);
+      row.innerHTML = `<div class="check-box${saved ? ' checked' : ''}" id="cb-${idx}"><span class="check-tick">✓</span></div>
+        <span class="check-label" style="color:${saved ? 'var(--text2)' : 'var(--text)'}">${item.label}</span>
+        <span class="check-weight">×${item.w}</span>`;
+      se.appendChild(row);
+    });
+    body.appendChild(se);
+  });
+  updateScore();
+}
+
+function resetChecklist() {
+  checkState = {}; checkItems.forEach(c => c.checked = false);
+  saveState(); buildChecklist();
+}
+
+function toggleCheck(idx, row) {
+  checkItems[idx].checked = !checkItems[idx].checked;
+  checkState[checkItems[idx].label] = checkItems[idx].checked;
+  document.getElementById('cb-' + idx).className = 'check-box' + (checkItems[idx].checked ? ' checked' : '');
+  row.querySelector('.check-label').style.color = checkItems[idx].checked ? 'var(--text2)' : 'var(--text)';
+  saveState(); updateScore();
+}
+
+function updateScore() {
+  const score = checkItems.reduce((a, c) => a + (c.checked ? c.w : 0), 0);
+  const max = checkItems.reduce((a, c) => a + c.w, 0);
+  const pct = max ? Math.round(score / max * 100) : 0;
+  document.getElementById('score-num').textContent = score;
+  document.getElementById('score-max').textContent = max;
+  const fill = document.getElementById('score-fill'); fill.style.width = pct + '%';
+  const cls = pct >= 70 ? 'high' : pct >= 40 ? 'mid' : 'low';
+  fill.className = 'score-fill ' + cls;
+  document.getElementById('score-num').className = 'score-num ' + cls;
+  document.getElementById('verdict-text').textContent = pct >= 70
+    ? 'Strong setup — proceed with discipline'
+    : pct >= 40 ? 'Moderate confluence — reduce size or wait'
+    : 'Low confluence — stay out, protect capital';
+  const pair = document.getElementById('cl-pair').value;
+  document.getElementById('cl-bias').textContent = `${pair} · ${score}/${max}`;
+}
+
+function sendChecklistToAI() {
+  const score = checkItems.reduce((a, c) => a + (c.checked ? c.w : 0), 0);
+  const max = checkItems.reduce((a, c) => a + c.w, 0);
+  const checked = checkItems.filter(c => c.checked).map(c => c.label);
+  document.getElementById('ai-pair').value = document.getElementById('cl-pair').value;
+  document.getElementById('ai-context').value = `Pre-trade checklist score: ${score}/${max}\nConfluences confirmed: ${checked.join(', ') || 'none'}`;
+  showTab('analyzer', document.querySelectorAll('.nav-btn')[3]);
+}
+
+// ─── JOURNAL ──────────────────────────────────────────────────────────────────
+function toggleForm() {
+  formOpen = !formOpen;
+  document.getElementById('add-form').className = 'add-form' + (formOpen ? ' open' : '');
+}
+
+function calcRR() {
+  const e = parseFloat(document.getElementById('f-entry').value);
+  const s = parseFloat(document.getElementById('f-sl').value);
+  const t = parseFloat(document.getElementById('f-tp').value);
+  if (!isNaN(e) && !isNaN(s) && !isNaN(t) && e !== s) {
+    document.getElementById('f-rr').value = (Math.abs(t - e) / Math.abs(e - s)).toFixed(2);
+  }
+}
+['f-entry','f-sl','f-tp'].forEach(id => {
+  document.getElementById(id).addEventListener('input', calcRR);
+});
+
+function logTrade() {
+  const pair = document.getElementById('f-pair').value;
+  const rr = document.getElementById('f-rr').value;
+  const r = parseFloat(document.getElementById('f-r').value);
+  if (!pair) { showToast('Select a pair', 'error'); return; }
+  trades.unshift({
+    id: Date.now(),
+    date: new Date().toISOString().split('T')[0],
+    pair, dir: document.getElementById('f-dir').value,
+    sess: document.getElementById('f-sess').value,
+    rr: rr ? '1:' + rr : '—',
+    result: document.getElementById('f-result').value.toLowerCase(),
+    r: isNaN(r) ? 0 : r,
+    notes: document.getElementById('f-notes').value
+  });
+  saveState(); toggleForm(); renderJournal();
+  showToast('Trade logged', 'success');
+  // clear form
+  ['f-entry','f-sl','f-tp','f-rr','f-r','f-notes'].forEach(id => document.getElementById(id).value = '');
+}
+
+function deleteTrade(id) {
+  trades = trades.filter(t => t.id !== id);
+  saveState(); renderJournal(); showToast('Trade deleted');
+}
+
+function clearAllTrades() {
+  if (!confirm('Clear all trades? This cannot be undone.')) return;
+  trades = []; saveState(); renderJournal(); showToast('All trades cleared');
+}
+
+function renderJournal() {
+  const filtered = filterActive === 'ALL' ? trades : trades.filter(t => t.pair === filterActive);
+  const total = trades.length;
+  const wins = trades.filter(t => t.result === 'win').length;
+  const totalR = trades.reduce((a, t) => a + (t.result === 'win' ? t.r : t.result === 'loss' ? -1 : 0), 0);
+  const wr = total ? Math.round(wins / total * 100) : 0;
+  const best = trades.length ? Math.max(...trades.map(t => t.r), 0) : 0;
+  document.getElementById('journal-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Total Trades</div><div class="stat-val neu">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-val ${wr >= 50 ? 'pos' : 'neg'}">${wr}%</div></div>
+    <div class="stat-card"><div class="stat-label">Total R</div><div class="stat-val ${totalR >= 0 ? 'pos' : 'neg'}">${totalR >= 0 ? '+' : ''}${totalR.toFixed(1)}R</div></div>
+    <div class="stat-card"><div class="stat-label">Best Trade</div><div class="stat-val pos">+${best.toFixed(1)}R</div></div>`;
+  const body = document.getElementById('trade-log-body');
+  if (!filtered.length) {
+    body.innerHTML = `<tr><td colspan="8" class="empty-log">No trades yet${filterActive !== 'ALL' ? ' for ' + filterActive : ''}. Log your first setup above.</td></tr>`;
+    return;
+  }
+  body.innerHTML = filtered.map(t => `
+    <tr>
+      <td>${t.date}</td>
+      <td class="log-cell-pair">${t.pair}</td>
+      <td><span class="dir-tag ${t.dir === 'Long' ? 'dir-long' : 'dir-short'}">${t.dir}</span></td>
+      <td style="font-size:10px;color:var(--text2)">${t.sess}</td>
+      <td>${t.rr}</td>
+      <td class="log-cell-${t.result}">${t.result.toUpperCase()}</td>
+      <td class="notes-cell" title="${t.notes}">${t.notes}</td>
+      <td><div class="row-btns">
+        <button class="ai-btn" onclick="reviewTrade(${t.id})">AI</button>
+        <a class="tv-btn" href="#" onclick="openTV('${t.pair}','15');return false">TV</a>
+        <button class="del-btn" onclick="deleteTrade(${t.id})">×</button>
+      </div></td>
+    </tr>`).join('');
+}
+
+async function reviewTrade(id) {
+  const t = trades.find(x => x.id === id);
+  if (!t) return;
+  if (pairs.includes(t.pair)) document.getElementById('ai-pair').value = t.pair;
+  document.getElementById('ai-context').value = `Logged trade review:\nPair: ${t.pair} | Direction: ${t.dir} | Session: ${t.sess}\nResult: ${t.result.toUpperCase()} | R:R: ${t.rr}\nNotes: ${t.notes}`;
+  showTab('analyzer', document.querySelectorAll('.nav-btn')[3]);
+  await analyzeSetup();
+}
+
+// ─── SCREENSHOTS ──────────────────────────────────────────────────────────────
+function handleFiles(files) {
+  Array.from(files).slice(0, 5 - screenshots.length).forEach(f => {
+    const r = new FileReader();
+    r.onload = e => { screenshots.push({name: f.name, data: e.target.result, type: f.type}); renderPreviews(); };
+    r.readAsDataURL(f);
+  });
+}
+function handleDrop(e) { e.preventDefault(); document.getElementById('drop-zone').style.borderColor = ''; handleFiles(e.dataTransfer.files); }
+function removeScreenshot(idx) { screenshots.splice(idx, 1); renderPreviews(); }
+function renderPreviews() {
+  const cont = document.getElementById('ss-previews'); cont.innerHTML = '';
+  screenshots.forEach((s, i) => {
+    const t = document.createElement('div'); t.className = 'screenshot-thumb';
+    t.innerHTML = `<img src="${s.data}" alt="${s.name}"><button class="thumb-remove" onclick="removeScreenshot(${i})">×</button>`;
+    cont.appendChild(t);
+  });
+  document.getElementById('ss-count').textContent = screenshots.length
+    ? screenshots.length + ' screenshot' + (screenshots.length > 1 ? 's' : '') + ' attached' : '';
+}
+
+// ─── AI ANALYZER ─────────────────────────────────────────────────────────────
+function toggleTag(el) { el.className = 'tag-toggle' + (el.className.includes(' on') ? '' : ' on'); }
+
+async function analyzeSetup() {
+  const apiKey = getApiKey();
+  if (!apiKey) { openSettings(); return; }
+  const pair = document.getElementById('ai-pair').value;
+  const tf = document.getElementById('ai-tf').value;
+  const bias = document.getElementById('ai-bias').value;
+  const sess = document.getElementById('ai-sess').value;
+  const tags = [...document.querySelectorAll('.tag-toggle.on')].map(t => t.textContent);
+  const ctx = document.getElementById('ai-context').value;
+  const out = document.getElementById('ai-output');
+  const btn = document.getElementById('analyze-btn');
+  document.getElementById('ai-badges').innerHTML = '';
+  document.getElementById('ai-input-summary').innerHTML = screenshots.length
+    ? `<span style="font-size:11px;font-family:'Space Mono',monospace;color:var(--blue)">${screenshots.length} screenshot${screenshots.length > 1 ? 's' : ''} attached</span>` : '';
+  out.innerHTML = '<span class="ai-thinking">Analyzing setup</span>';
+  btn.disabled = true;
+  const prompt = `You are an ICT (Inner Circle Trader) trading coach. Analyze this setup concisely.\n\nPair: ${pair}\nTimeframe: ${tf}\nBias: ${bias}\nSession: ${sess}\nICT Confluences: ${tags.join(', ') || 'none specified'}\nContext: ${ctx || 'none'}${screenshots.length ? `\n\n${screenshots.length} chart screenshot(s) provided — describe what you observe in price structure and whether it aligns with stated confluences.` : ''}\n\nProvide:\n1. Setup grade (A/B/C) with brief reason\n2. Key strengths (1-2 points)\n3. Key risks / what to watch (1-2 points)\n4. Suggested next step\n\nBe direct, ICT-specific, under 180 words. No markdown headers.`;
+  const content = screenshots.length
+    ? [...screenshots.map(s => ({type:'image',source:{type:'base64',media_type:s.type,data:s.data.split(',')[1]}})), {type:'text',text:prompt}]
+    : [{type:'text',text:prompt}];
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content}]})
+    });
+    const data = await res.json();
+    if (data.error) { out.innerHTML = `<span style="color:var(--red)">API Error: ${data.error.message}</span>`; btn.disabled = false; return; }
+    const text = data.content?.find(b => b.type === 'text')?.text || 'No response.';
+    out.innerHTML = text.replace(/\n/g, '<br>');
+    const grade = text.match(/\b([ABC])[- ](grade|setup|quality)/i)?.[1] || text.match(/Grade[:\s]+([ABC])\b/i)?.[1] || 'B';
+    document.getElementById('ai-badges').innerHTML = `
+      <span class="ai-score-badge badge-${grade}">${grade} SETUP</span>
+      <span class="ai-score-badge" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border)">${pair} · ${sess}</span>
+      ${screenshots.length ? `<span class="ai-score-badge" style="background:rgba(74,158,255,0.1);color:var(--blue);border:1px solid rgba(74,158,255,0.3)">${screenshots.length} chart${screenshots.length > 1 ? 's' : ''} analyzed</span>` : ''}`;
+  } catch (e) {
+    out.innerHTML = `<span style="color:var(--red)">Request failed: ${e.message}</span>`;
+  }
+  btn.disabled = false;
+}
+
+// ─── LIVE CHART ───────────────────────────────────────────────────────────────
+function setChartTF(el, tf) {
+  currentTF = tf;
+  document.querySelectorAll('.tf-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active'); loadTVChart();
+}
+function loadTVChart() {
+  const container = document.getElementById('tv-chart-container'); container.innerHTML = '';
+  const pair = document.getElementById('chart-pair-sel').value || pairs[0];
+  const sym = tvSymbol(pair);
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://s.tradingview.com/widgetembed/?frameElementId=tv_chart&symbol=${encodeURIComponent(sym)}&interval=${currentTF}&theme=dark&style=1&locale=en&toolbar_bg=%23111318&enable_publishing=false&hide_side_toolbar=0&withdateranges=1&hideideas=1&saveimage=1`;
+  iframe.style.cssText = 'width:100%;height:460px;border:none';
+  iframe.setAttribute('allowtransparency', 'true');
+  iframe.setAttribute('allowfullscreen', 'true');
+  container.appendChild(iframe);
+}
+
+// ─── PINE SCRIPT ─────────────────────────────────────────────────────────────
+function togglePineOpt(el) { el.className = 'pine-opt' + (el.className.includes(' on') ? '' : ' on'); }
+
+function generatePine() {
+  const pair = document.getElementById('pine-pair').value;
+  const bias = document.getElementById('pine-bias').value;
+  const opts = [...document.querySelectorAll('.pine-opt.on')].map(o => o.textContent.trim());
+  const msg = document.getElementById('pine-msg').value.replace(/'/g, "\\'");
+  const blocks = [], vars = [];
+  if (opts.includes('Kill Zone Active')) { blocks.push(`    bool londonKZ = (hour >= 8 and hour < 10) or (hour >= 11 and hour < 13)\n    bool nyKZ = (hour >= 13 and hour < 15) or (hour >= 15 and hour < 16)\n    bool asianKZ = hour >= 22 or hour < 1\n    bool killZoneActive = londonKZ or nyKZ or asianKZ`); vars.push('killZoneActive'); }
+  if (opts.includes('FVG Formed')) { blocks.push(`    bool bullFVG = low > high[2] and close[1] > high[2]\n    bool bearFVG = high < low[2] and close[1] < low[2]\n    bool fvgFormed = bullFVG or bearFVG`); vars.push('fvgFormed'); }
+  if (opts.includes('Session Open')) { blocks.push(`    bool sessionOpen = (hour == 8 and minute == 0) or (hour == 13 and minute == 0)`); vars.push('sessionOpen'); }
+  if (opts.includes('OB Identified')) { blocks.push(`    bool bullOB = close[1] < open[1] and close > open and close > high[1]\n    bool bearOB = close[1] > open[1] and close < open and close < low[1]\n    bool obFormed = bullOB or bearOB`); vars.push('obFormed'); }
+  if (opts.includes('Liquidity Sweep')) { blocks.push(`    bool liqSweep = (high > ta.highest(high[1], 20) and close < ta.highest(high[1], 20)) or (low < ta.lowest(low[1], 20) and close > ta.lowest(low[1], 20))`); vars.push('liqSweep'); }
+  if (opts.includes('BOS / CHoCH')) { blocks.push(`    bool bos = ta.crossover(close, ta.highest(high[1], 10)) or ta.crossunder(close, ta.lowest(low[1], 10))`); vars.push('bos'); }
+  if (opts.includes('OTE Zone')) { blocks.push(`    float swH = ta.highest(high, 20)\n    float swL = ta.lowest(low, 20)\n    float fib618 = swH - (swH - swL) * 0.618\n    float fib79 = swH - (swH - swL) * 0.79\n    bool inOTE = close >= math.min(fib618,fib79) and close <= math.max(fib618,fib79)`); vars.push('inOTE'); }
+  let biasBlock = '';
+  if (bias === 'bull') { biasBlock = '\n    bool biasOk = close > ta.sma(close, 50)'; vars.push('biasOk'); }
+  else if (bias === 'bear') { biasBlock = '\n    bool biasOk = close < ta.sma(close, 50)'; vars.push('biasOk'); }
+  const cond = vars.length ? vars.join(' and ') : 'true';
+  const code = `<span class="cmt">// ICT Confluence Alert — ${pair}</span>\n<span class="cmt">// Generated by ICT Desk · ${new Date().toLocaleDateString()}</span>\n<span class="kw">//@version</span>=<span class="num">5</span>\n<span class="fn">indicator</span>(<span class="str">"ICT Confluence Alert"</span>, overlay=<span class="kw">true</span>)\n\n<span class="cmt">// Timezone (UTC)</span>\n<span class="kw">int</span> hour = <span class="fn">hour</span>(time, <span class="str">"UTC"</span>)\n<span class="kw">int</span> minute = <span class="fn">minute</span>(time, <span class="str">"UTC"</span>)\n\n<span class="cmt">// Conditions</span>\n<span class="kw">if</span> barstate.isconfirmed\n${blocks.join('\n')}${biasBlock}\n\n    <span class="kw">bool</span> alertTrigger = ${cond}\n\n    <span class="kw">if</span> alertTrigger\n        <span class="fn">alert</span>(<span class="str">'${msg}'</span>, alert.freq_once_per_bar)\n        <span class="fn">label.new</span>(bar_index, high, <span class="str">"ICT"</span>, color=color.new(color.gold, 20), textcolor=color.white, style=label.style_label_down, size=size.small)\n\n<span class="fn">plotshape</span>(false, title=<span class="str">"ICT Alert Triggered"</span>)`;
+  document.getElementById('pine-output').innerHTML = code;
+}
+
+function copyPine() {
+  const text = document.getElementById('pine-output').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.copy-btn'); btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+    showToast('Pine Script copied', 'success');
+  });
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+populatePairSelects();
+buildChecklist();
+renderJournal();
+buildKillZones();
+updateClocks();
+checkWeekend();
+updateApiIndicator();
+setTimeout(generatePine, 500);
+setInterval(updateClocks, 1000);
+setInterval(buildKillZones, 60000);
+setInterval(checkWeekend, 60000);
+</script>
+</body>
+</html>
+
 
 // ─── SESSIONS & CLOCKS ───────────────────────────────────────────────────────
 const SESSIONS = [
