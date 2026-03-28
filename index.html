@@ -232,6 +232,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
   .journal-top{grid-template-columns:1fr 1fr}
   .nav-btn{font-size:11px;padding:5px 10px}
 }
+
+/* NEWS */
+.news-row td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle}
+.news-row:last-child td{border-bottom:none}
+.news-row:hover td{background:var(--bg3)}
+.news-row.past td{opacity:0.45}
+.news-row.upcoming td{background:rgba(212,168,67,0.04)}
+.impact-high{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--red);margin-right:6px}
+.impact-med{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--gold);margin-right:6px}
+.news-currency{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;padding:2px 7px;border-radius:3px;background:var(--bg3);border:1px solid var(--border)}
+.news-currency.usd{color:#4a9eff;border-color:rgba(74,158,255,0.3)}
+.news-currency.eur{color:#a78bfa;border-color:rgba(167,139,250,0.3)}
+.news-currency.gbp{color:#3dbb7a;border-color:rgba(61,187,122,0.3)}
+.news-currency.jpy{color:#f0c060;border-color:rgba(240,192,96,0.3)}
+.news-currency.aud{color:#e05555;border-color:rgba(224,85,85,0.3)}
+.news-time{font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)}
+.news-live{font-size:10px;padding:2px 7px;border-radius:3px;background:rgba(224,85,85,0.15);color:var(--red);font-family:'Space Mono',monospace;border:1px solid rgba(224,85,85,0.3)}
 </style>
 </head>
 <body>
@@ -247,6 +264,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
     <button class="nav-btn" onclick="showTab('analyzer',this)">AI Analyzer</button>
     <button class="nav-btn" onclick="showTab('chart',this)">Live Chart</button>
     <button class="nav-btn" onclick="showTab('pine',this)">Pine Script</button>
+    <button class="nav-btn" onclick="showTab('news',this)">News</button>
+    <button class="nav-btn" onclick="showTab('risk',this)">Risk Calc</button>
   </div>
   <div class="header-right">
     <span id="api-dot" class="api-indicator"></span>
@@ -469,6 +488,139 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
         Paste into TradingView Pine Editor → Add to chart → Create alert → condition: "ICT Alert Triggered" → enable webhook URL.
       </div>
     </div>
+  </div>
+</div>
+
+<!-- NEWS CALENDAR TAB -->
+<div class="content tab" id="tab-news">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3)">High Impact Economic Events</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span id="next-event-countdown" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--gold)"></span>
+      <a href="https://www.forexfactory.com/calendar" target="_blank" class="tv-btn" style="font-size:11px;padding:4px 10px">Open Forex Factory</a>
+    </div>
+  </div>
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;min-width:600px">
+      <thead>
+        <tr style="background:var(--bg3);border-bottom:1px solid var(--border)">
+          <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Time (UTC)</th>
+          <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Currency</th>
+          <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Event</th>
+          <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Impact</th>
+          <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Status</th>
+        </tr>
+      </thead>
+      <tbody id="news-body"></tbody>
+    </table>
+  </div>
+  <div style="margin-top:12px;font-size:11px;color:var(--text3);line-height:1.7">
+    Showing high-impact events for the current week. Times in UTC. Always avoid entering 2 minutes before and after red folder events.
+    For full calendar with actual/forecast/previous data, open <a href="https://www.forexfactory.com/calendar" target="_blank" style="color:var(--blue)">Forex Factory</a>.
+  </div>
+</div>
+
+<!-- RISK CALCULATOR TAB -->
+<div class="content tab" id="tab-risk">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+    <!-- Position Size Calculator -->
+    <div class="ai-panel">
+      <div class="ai-panel-title">Position Size Calculator</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="form-group"><label class="form-label">Account Balance ($)</label><input class="form-input" id="r-balance" type="number" placeholder="10000" oninput="calcPosition()"></div>
+        <div class="form-group"><label class="form-label">Risk Per Trade (%)</label><input class="form-input" id="r-risk-pct" type="number" placeholder="1" step="0.1" value="1" oninput="calcPosition()"></div>
+        <div class="form-group"><label class="form-label">Stop Loss (pips)</label><input class="form-input" id="r-sl-pips" type="number" placeholder="20" oninput="calcPosition()"></div>
+        <div class="form-group"><label class="form-label">Pair</label>
+          <select class="form-select" id="r-pair" onchange="calcPosition()">
+            <option value="forex">Forex (EURUSD, GBPUSD, AUDUSD)</option>
+            <option value="jpy">JPY Pairs (USDJPY)</option>
+            <option value="xau">Gold (XAUUSD)</option>
+          </select>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px;margin-top:4px">
+          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Result</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">$ at risk</div><div style="font-family:'Space Mono',monospace;font-size:18px;color:var(--red)" id="r-dollar-risk">—</div></div>
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Lot size</div><div style="font-family:'Space Mono',monospace;font-size:18px;color:var(--gold)" id="r-lot-size">—</div></div>
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Units</div><div style="font-family:'Space Mono',monospace;font-size:14px;color:var(--text2)" id="r-units">—</div></div>
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Pip value</div><div style="font-family:'Space Mono',monospace;font-size:14px;color:var(--text2)" id="r-pip-val">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- R:R Calculator -->
+    <div class="ai-panel">
+      <div class="ai-panel-title">R:R Calculator</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="form-group"><label class="form-label">Entry Price</label><input class="form-input" id="rr-entry" type="number" step="0.00001" placeholder="1.08500" oninput="calcRR2()"></div>
+        <div class="form-group"><label class="form-label">Stop Loss</label><input class="form-input" id="rr-sl" type="number" step="0.00001" placeholder="1.08200" oninput="calcRR2()"></div>
+        <div class="form-group"><label class="form-label">Take Profit</label><input class="form-input" id="rr-tp" type="number" step="0.00001" placeholder="1.09400" oninput="calcRR2()"></div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px;margin-top:4px">
+          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Result</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">R:R Ratio</div><div style="font-family:'Space Mono',monospace;font-size:24px;font-weight:700;color:var(--gold)" id="rr-ratio">—</div></div>
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Grade</div><div style="font-family:'Space Mono',monospace;font-size:24px;font-weight:700" id="rr-grade">—</div></div>
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Risk pips</div><div style="font-family:'Space Mono',monospace;font-size:14px;color:var(--red)" id="rr-risk-pips">—</div></div>
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Reward pips</div><div style="font-family:'Space Mono',monospace;font-size:14px;color:var(--green)" id="rr-reward-pips">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Max Loss Per Day -->
+    <div class="ai-panel">
+      <div class="ai-panel-title">Daily Loss Limit</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="form-group"><label class="form-label">Account Balance ($)</label><input class="form-input" id="dl-balance" type="number" placeholder="10000" oninput="calcDailyLoss()"></div>
+        <div class="form-group"><label class="form-label">Max Daily Loss (%)</label><input class="form-input" id="dl-pct" type="number" placeholder="3" step="0.5" value="3" oninput="calcDailyLoss()"></div>
+        <div class="form-group"><label class="form-label">Risk Per Trade (%)</label><input class="form-input" id="dl-risk" type="number" placeholder="1" step="0.1" value="1" oninput="calcDailyLoss()"></div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px;margin-top:4px">
+          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Result</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Max loss / day</div><div style="font-family:'Space Mono',monospace;font-size:18px;color:var(--red)" id="dl-max">—</div></div>
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Max trades / day</div><div style="font-family:'Space Mono',monospace;font-size:18px;color:var(--gold)" id="dl-trades">—</div></div>
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Stop trading at</div><div style="font-family:'Space Mono',monospace;font-size:14px;color:var(--text2)" id="dl-stop-at">—</div></div>
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Rule</div><div style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text3)" id="dl-rule">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pip Value Calculator -->
+    <div class="ai-panel">
+      <div class="ai-panel-title">Pip Value Calculator</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="form-group"><label class="form-label">Pair</label>
+          <select class="form-select" id="pv-pair" onchange="calcPipValue()">
+            <option value="EURUSD">EURUSD</option>
+            <option value="GBPUSD">GBPUSD</option>
+            <option value="AUDUSD">AUDUSD</option>
+            <option value="USDJPY">USDJPY</option>
+            <option value="XAUUSD">XAUUSD (Gold)</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Lot Size</label>
+          <select class="form-select" id="pv-lot" onchange="calcPipValue()">
+            <option value="100000">1.00 Standard lot</option>
+            <option value="10000">0.10 Mini lot</option>
+            <option value="1000" selected>0.01 Micro lot</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Current Price (for JPY/Gold)</label><input class="form-input" id="pv-price" type="number" step="0.001" placeholder="e.g. 149.50" oninput="calcPipValue()"></div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px;margin-top:4px">
+          <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Pip Values (USD)</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">Per pip</div><div style="font-family:'Space Mono',monospace;font-size:18px;color:var(--gold)" id="pv-per-pip">—</div></div>
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">10 pips</div><div style="font-family:'Space Mono',monospace;font-size:18px;color:var(--text2)" id="pv-10pip">—</div></div>
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">20 pips</div><div style="font-family:'Space Mono',monospace;font-size:14px;color:var(--text2)" id="pv-20pip">—</div></div>
+            <div><div style="font-size:11px;color:var(--text3);margin-bottom:4px">50 pips</div><div style="font-family:'Space Mono',monospace;font-size:14px;color:var(--text2)" id="pv-50pip">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1016,11 +1168,158 @@ function copyPine() {
   });
 }
 
+
+// ─── NEWS CALENDAR ────────────────────────────────────────────────────────────
+function getWeeklyNews() {
+  const now = new Date();
+  const day = now.getUTCDay();
+  const monday = new Date(now);
+  monday.setUTCDate(now.getUTCDate() - ((day + 6) % 7));
+  monday.setUTCHours(0,0,0,0);
+  const events = [
+    {day:1,h:14,m:0,cur:'USD',name:'ISM Manufacturing PMI'},
+    {day:1,h:9,m:0,cur:'EUR',name:'German CPI m/m'},
+    {day:2,h:13,m:30,cur:'USD',name:'Core CPI m/m'},
+    {day:2,h:13,m:30,cur:'USD',name:'CPI m/m'},
+    {day:2,h:9,m:30,cur:'GBP',name:'Claimant Count Change'},
+    {day:3,h:13,m:30,cur:'USD',name:'Core PPI m/m'},
+    {day:3,h:13,m:30,cur:'USD',name:'PPI m/m'},
+    {day:3,h:18,m:0,cur:'USD',name:'FOMC Meeting Minutes'},
+    {day:3,h:9,m:30,cur:'GBP',name:'CPI y/y'},
+    {day:4,h:12,m:45,cur:'EUR',name:'ECB Rate Decision'},
+    {day:4,h:13,m:30,cur:'USD',name:'Unemployment Claims'},
+    {day:4,h:13,m:30,cur:'USD',name:'Retail Sales m/m'},
+    {day:4,h:13,m:30,cur:'EUR',name:'ECB Press Conference'},
+    {day:5,h:13,m:30,cur:'USD',name:'Non-Farm Payrolls'},
+    {day:5,h:13,m:30,cur:'USD',name:'Unemployment Rate'},
+    {day:5,h:13,m:30,cur:'USD',name:'Average Hourly Earnings m/m'},
+    {day:5,h:9,m:30,cur:'GBP',name:'GDP m/m'},
+    {day:5,h:14,m:0,cur:'USD',name:'Consumer Sentiment'},
+  ];
+  return events.map(e => {
+    const d = new Date(monday);
+    d.setUTCDate(monday.getUTCDate() + e.day - 1);
+    d.setUTCHours(e.h, e.m, 0, 0);
+    return {...e, time: d};
+  }).sort((a,b) => a.time - b.time);
+}
+
+function buildNewsCalendar() {
+  const now = new Date();
+  const events = getWeeklyNews();
+  const body = document.getElementById('news-body');
+  if (!body) return;
+  body.innerHTML = '';
+  let nextEvent = null;
+  events.forEach(e => {
+    const isPast = e.time < now;
+    const diffMs = e.time - now;
+    const isImminent = !isPast && diffMs < 7200000;
+    if (!isPast && !nextEvent) nextEvent = e;
+    const row = document.createElement('tr');
+    row.className = 'news-row' + (isPast ? ' past' : isImminent ? ' upcoming' : '');
+    const timeStr = `${String(e.time.getUTCHours()).padStart(2,'0')}:${String(e.time.getUTCMinutes()).padStart(2,'0')} UTC`;
+    const dateStr = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][e.time.getUTCDay()];
+    const curClass = e.cur.toLowerCase();
+    let statusHtml = '';
+    if (isPast) {
+      statusHtml = '<span style="font-size:10px;color:var(--text3);font-family:\'Space Mono\',monospace">Done</span>';
+    } else if (isImminent) {
+      const mins = Math.floor(diffMs / 60000);
+      statusHtml = `<span class="news-live">${mins < 1 ? 'NOW' : mins + 'm away'}</span>`;
+    } else {
+      const h = Math.floor(diffMs / 3600000);
+      const m = Math.floor((diffMs % 3600000) / 60000);
+      statusHtml = `<span style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace">in ${h > 0 ? h + 'h ' : ''}${m}m</span>`;
+    }
+    row.innerHTML = `<td class="news-time">${dateStr} ${timeStr}</td><td><span class="news-currency ${curClass}">${e.cur}</span></td><td style="color:var(--text);font-size:13px">${e.name}</td><td><span class="impact-high"></span><span style="font-size:10px;color:var(--red)">HIGH</span></td><td>${statusHtml}</td>`;
+    body.appendChild(row);
+  });
+  const cdEl = document.getElementById('next-event-countdown');
+  if (cdEl && nextEvent) {
+    const diff = nextEvent.time - now;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    cdEl.textContent = `Next: ${nextEvent.name} (${nextEvent.cur}) in ${h > 0 ? h + 'h ' : ''}${m}m`;
+  } else if (cdEl) {
+    cdEl.textContent = 'No more high-impact events this week';
+  }
+}
+
+// ─── RISK CALCULATORS ─────────────────────────────────────────────────────────
+function calcPosition() {
+  const balance = parseFloat(document.getElementById('r-balance').value);
+  const riskPct = parseFloat(document.getElementById('r-risk-pct').value);
+  const slPips = parseFloat(document.getElementById('r-sl-pips').value);
+  const pairType = document.getElementById('r-pair').value;
+  if (isNaN(balance) || isNaN(riskPct) || isNaN(slPips) || slPips === 0) return;
+  const dollarRisk = balance * (riskPct / 100);
+  let pipValuePerLot;
+  if (pairType === 'jpy') pipValuePerLot = 1000;
+  else if (pairType === 'xau') pipValuePerLot = 100;
+  else pipValuePerLot = 10;
+  const pipValuePerPip = dollarRisk / slPips;
+  const lots = pipValuePerPip / pipValuePerLot;
+  const units = Math.round(lots * 100000);
+  document.getElementById('r-dollar-risk').textContent = '$' + dollarRisk.toFixed(2);
+  document.getElementById('r-lot-size').textContent = lots.toFixed(2);
+  document.getElementById('r-units').textContent = units.toLocaleString();
+  document.getElementById('r-pip-val').textContent = '$' + (pipValuePerLot * lots).toFixed(2) + '/pip';
+}
+
+function calcRR2() {
+  const entry = parseFloat(document.getElementById('rr-entry').value);
+  const sl = parseFloat(document.getElementById('rr-sl').value);
+  const tp = parseFloat(document.getElementById('rr-tp').value);
+  if (isNaN(entry) || isNaN(sl) || isNaN(tp) || entry === sl) return;
+  const risk = Math.abs(entry - sl);
+  const reward = Math.abs(tp - entry);
+  const rr = reward / risk;
+  const riskPips = Math.round(risk * 10000) / 10;
+  const rewardPips = Math.round(reward * 10000) / 10;
+  const grade = rr >= 3 ? 'A' : rr >= 2 ? 'B' : rr >= 1.5 ? 'C' : 'D';
+  const gradeColor = rr >= 3 ? 'var(--green)' : rr >= 2 ? 'var(--gold)' : rr >= 1.5 ? 'var(--blue)' : 'var(--red)';
+  document.getElementById('rr-ratio').textContent = '1:' + rr.toFixed(2);
+  const gradeEl = document.getElementById('rr-grade');
+  gradeEl.textContent = grade; gradeEl.style.color = gradeColor;
+  document.getElementById('rr-risk-pips').textContent = riskPips + ' pips';
+  document.getElementById('rr-reward-pips').textContent = rewardPips + ' pips';
+}
+
+function calcDailyLoss() {
+  const balance = parseFloat(document.getElementById('dl-balance').value);
+  const maxPct = parseFloat(document.getElementById('dl-pct').value);
+  const riskPct = parseFloat(document.getElementById('dl-risk').value);
+  if (isNaN(balance) || isNaN(maxPct) || isNaN(riskPct) || riskPct === 0) return;
+  const maxLoss = balance * (maxPct / 100);
+  const maxTrades = Math.floor(maxPct / riskPct);
+  const stopAt = balance - maxLoss;
+  document.getElementById('dl-max').textContent = '$' + maxLoss.toFixed(2);
+  document.getElementById('dl-trades').textContent = maxTrades + ' trades';
+  document.getElementById('dl-stop-at').textContent = '$' + stopAt.toFixed(2);
+  document.getElementById('dl-rule').textContent = riskPct + '% × ' + maxTrades + ' = ' + (riskPct * maxTrades).toFixed(1) + '% max';
+}
+
+function calcPipValue() {
+  const pair = document.getElementById('pv-pair').value;
+  const units = parseFloat(document.getElementById('pv-lot').value);
+  const price = parseFloat(document.getElementById('pv-price').value) || 1;
+  let pipValue;
+  if (pair === 'USDJPY') pipValue = (0.01 / price) * units;
+  else if (pair === 'XAUUSD') pipValue = 0.1 * (units / 100);
+  else pipValue = 0.0001 * units;
+  document.getElementById('pv-per-pip').textContent = '$' + pipValue.toFixed(2);
+  document.getElementById('pv-10pip').textContent = '$' + (pipValue * 10).toFixed(2);
+  document.getElementById('pv-20pip').textContent = '$' + (pipValue * 20).toFixed(2);
+  document.getElementById('pv-50pip').textContent = '$' + (pipValue * 50).toFixed(2);
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 populatePairSelects();
 buildChecklist();
 renderJournal();
 buildKillZones();
+buildNewsCalendar();
 updateClocks();
 checkWeekend();
 updateApiIndicator();
@@ -1028,6 +1327,7 @@ setTimeout(generatePine, 500);
 setInterval(updateClocks, 1000);
 setInterval(buildKillZones, 60000);
 setInterval(checkWeekend, 60000);
+setInterval(buildNewsCalendar, 60000);
 </script>
 </body>
 </html>
