@@ -233,7 +233,46 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
   .nav-btn{font-size:11px;padding:5px 10px}
 }
 
-/* NEWS */
+/* ANNOTATOR */
+.ann-layout{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
+@media(max-width:800px){.ann-layout{grid-template-columns:1fr}}
+.ann-canvas-wrap{position:relative;background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden;min-height:300px;display:flex;align-items:center;justify-content:center}
+.ann-drop{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer}
+.ann-drop-icon{width:40px;height:40px;border:2px dashed var(--border2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:20px}
+.ann-canvas{display:block;width:100%;border-radius:8px}
+.ann-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.ann-legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);font-family:'Space Mono',monospace}
+.ann-legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.ann-result{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px;margin-top:12px;font-size:13px;color:var(--text2);line-height:1.8;min-height:100px}
+.ann-btn{width:100%;padding:10px;background:var(--gold3);border:1px solid var(--gold);color:var(--gold2);border-radius:4px;font-family:'Syne',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;margin-top:12px}
+.ann-btn:hover{background:var(--gold);color:var(--bg)}
+.ann-btn:disabled{opacity:0.5;cursor:not-allowed}
+.ann-clear-btn{width:100%;padding:7px;background:transparent;border:1px solid var(--border2);color:var(--text3);border-radius:4px;font-family:'Syne',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;margin-top:6px}
+.ann-clear-btn:hover{border-color:var(--red);color:var(--red)}
+.download-btn{width:100%;padding:7px;background:rgba(74,158,255,0.1);border:1px solid rgba(74,158,255,0.3);color:var(--blue);border-radius:4px;font-family:'Syne',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;margin-top:6px;display:none}
+.download-btn:hover{background:rgba(74,158,255,0.2)}
+.ann-thinking{color:var(--text3);font-style:italic;font-family:'Space Mono',monospace;font-size:12px}
+.ann-thinking::after{content:'...';animation:dots 1.2s steps(3,end) infinite}
+.bt-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.bt-section{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+.bt-section-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
+.bt-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bt-bar-label{font-size:11px;color:var(--text2);width:110px;flex-shrink:0;font-family:'Space Mono',monospace}
+.bt-bar-track{flex:1;height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+.bt-bar-fill{height:100%;border-radius:3px;background:var(--gold);transition:width 0.4s}
+.bt-bar-val{font-size:11px;color:var(--text);font-family:'Space Mono',monospace;width:50px;text-align:right}
+.bt-form{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:16px;margin-bottom:14px;display:none}
+.bt-form.open{display:block}
+.bt-add-btn{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;cursor:pointer;color:var(--gold);font-size:13px;margin-bottom:14px;transition:all 0.15s;font-family:'Syne',sans-serif;letter-spacing:1px;width:100%}
+.bt-add-btn:hover{border-color:var(--gold);background:var(--bg4)}
+.bt-table{width:100%;border-collapse:collapse;min-width:700px}
+.bt-table th{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);padding:10px 12px;background:var(--bg3);border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}
+.bt-table td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle;color:var(--text)}
+.bt-table tr:last-child td{border-bottom:none}
+.bt-table tr:hover td{background:var(--bg3)}
+.setup-tag{font-size:10px;padding:2px 7px;border-radius:3px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:'Space Mono',monospace}
+.ai-backtest-panel{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
+@media(max-width:700px){.ai-backtest-panel{grid-template-columns:1fr}.bt-stat-grid{grid-template-columns:1fr 1fr}}
 .news-row td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle}
 .news-row:last-child td{border-bottom:none}
 .news-row:hover td{background:var(--bg3)}
@@ -266,6 +305,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
     <button class="nav-btn" onclick="showTab('pine',this)">Pine Script</button>
     <button class="nav-btn" onclick="showTab('news',this)">News</button>
     <button class="nav-btn" onclick="showTab('risk',this)">Risk Calc</button>
+    <button class="nav-btn" onclick="showTab('backtest',this)">Backtest</button>
+    <button class="nav-btn" onclick="showTab('annotator',this)">Annotator</button>
   </div>
   <div class="header-right">
     <span id="api-dot" class="api-indicator"></span>
@@ -624,6 +665,169 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
   </div>
 </div>
 
+<!-- BACKTEST TAB -->
+<div class="content tab" id="tab-backtest">
+
+  <!-- Stats Overview -->
+  <div class="bt-stat-grid" id="bt-stats"></div>
+
+  <!-- Charts Row -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+    <div class="bt-section">
+      <div class="bt-section-title">Equity Curve</div>
+      <canvas id="bt-equity-chart" height="140"></canvas>
+    </div>
+    <div class="bt-section">
+      <div class="bt-section-title">Win Rate by Session</div>
+      <div id="bt-session-bars"></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+    <div class="bt-section">
+      <div class="bt-section-title">Win Rate by Pair</div>
+      <div id="bt-pair-bars"></div>
+    </div>
+    <div class="bt-section">
+      <div class="bt-section-title">Win Rate by Setup Type</div>
+      <div id="bt-setup-bars"></div>
+    </div>
+  </div>
+
+  <!-- Manual Logger -->
+  <button class="bt-add-btn" onclick="toggleBtForm()">+ Log Backtest Trade</button>
+  <div class="bt-form" id="bt-form">
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="bt-date" type="date"></div>
+      <div class="form-group"><label class="form-label">Pair</label><select class="form-select" id="bt-pair"></select></div>
+      <div class="form-group"><label class="form-label">Session</label>
+        <select class="form-select" id="bt-sess"><option>London</option><option>New York</option><option>Asian</option><option>Silver Bullet</option></select></div>
+      <div class="form-group"><label class="form-label">Setup Type</label>
+        <select class="form-select" id="bt-setup">
+          <option>FVG Entry</option><option>OB Entry</option><option>OTE Retracement</option>
+          <option>Liq Sweep + Reversal</option><option>BOS Retest</option><option>Silver Bullet</option><option>NWOG Fill</option>
+        </select></div>
+      <div class="form-group"><label class="form-label">Result</label>
+        <select class="form-select" id="bt-result"><option>Win</option><option>Loss</option><option>BE</option></select></div>
+      <div class="form-group"><label class="form-label">R Gained/Lost</label><input class="form-input" id="bt-r" type="number" step="0.1" placeholder="2.5"></div>
+    </div>
+    <div class="form-group" style="margin-bottom:10px"><label class="form-label">Notes</label>
+      <textarea class="form-textarea" id="bt-notes" placeholder="What did you see? What worked or didn't?"></textarea></div>
+    <div class="form-actions">
+      <button class="btn primary" onclick="logBtTrade()">Log Trade</button>
+      <button class="btn" onclick="toggleBtForm()">Cancel</button>
+      <button class="btn danger" style="margin-left:auto" onclick="clearBtTrades()">Clear All</button>
+    </div>
+  </div>
+
+  <!-- Trade Log -->
+  <div class="bt-section" style="overflow-x:auto;padding:0">
+    <table class="bt-table">
+      <thead><tr>
+        <th>Date</th><th>Pair</th><th>Session</th><th>Setup</th><th>Result</th><th>R</th><th>Notes</th><th>AI Review</th>
+      </tr></thead>
+      <tbody id="bt-log-body"></tbody>
+    </table>
+  </div>
+
+  <!-- AI Backtest Panel -->
+  <div style="margin-top:14px">
+    <div class="bt-section-title" style="margin-bottom:10px">AI Backtest Analyzer</div>
+    <div class="ai-backtest-panel">
+      <div class="ai-panel">
+        <div class="ai-panel-title">Describe Your Setup Rule</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="form-group"><label class="form-label">Setup Name</label>
+            <input class="form-input" id="abt-name" placeholder="e.g. London FVG OTE Entry"></div>
+          <div class="form-group"><label class="form-label">Entry Rules</label>
+            <textarea class="form-textarea" id="abt-rules" style="min-height:80px" placeholder="e.g. Wait for London KZ, look for liquidity sweep on Asian high/low, entry on 15M FVG after CHoCH, OTE at 61.8-79%, SL below OB, TP at next liquidity"></textarea></div>
+          <div class="form-group"><label class="form-label">Pairs Tested</label>
+            <input class="form-input" id="abt-pairs" placeholder="e.g. XAUUSD, EURUSD"></div>
+          <div class="form-group"><label class="form-label">Sample Size (trades logged)</label>
+            <input class="form-input" id="abt-sample" type="number" placeholder="20"></div>
+          <div class="form-group"><label class="form-label">Your Results Summary</label>
+            <textarea class="form-textarea" id="abt-results" placeholder="e.g. 14W/6L, avg R 2.3, best on London session, struggled on NY"></textarea></div>
+        </div>
+        <button class="analyze-btn" id="abt-btn" onclick="aiBacktest()">Analyze Setup with AI</button>
+      </div>
+      <div class="ai-panel">
+        <div class="ai-panel-title">AI Backtest Feedback</div>
+        <div class="ai-output" id="abt-output"><span style="color:var(--text3)">Describe your setup rules and results, then click Analyze for ICT-specific backtest feedback.</span></div>
+        <div id="abt-badges" style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ANNOTATOR TAB -->
+<div class="content tab" id="tab-annotator">
+  <div class="ann-layout">
+
+    <!-- Controls -->
+    <div>
+      <div class="ai-panel" style="margin-bottom:12px">
+        <div class="ai-panel-title">Chart Setup</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="form-group"><label class="form-label">Pair</label><select class="inline-select" id="ann-pair"></select></div>
+          <div class="form-group"><label class="form-label">Timeframe</label>
+            <select class="inline-select" id="ann-tf">
+              <option>1D</option><option>4H</option><option>1H</option><option selected>15M</option><option>5M</option><option>1M</option>
+            </select></div>
+          <div class="form-group"><label class="form-label">Bias</label>
+            <select class="inline-select" id="ann-bias"><option>Bullish</option><option>Bearish</option><option>Let AI decide</option></select></div>
+          <div class="form-group"><label class="form-label">Entry Style</label>
+            <select class="inline-select" id="ann-style">
+              <option>Sniper (tight SL, high R)</option>
+              <option>Standard ICT Model</option>
+              <option>Scalp (quick in/out)</option>
+              <option>Swing (higher TF targets)</option>
+            </select></div>
+          <div class="form-group"><label class="form-label">Extra Context</label>
+            <textarea class="form-textarea" id="ann-ctx" placeholder="e.g. Daily bias bullish, swept Asian lows, now in London KZ..." style="min-height:60px"></textarea></div>
+        </div>
+        <button class="ann-btn" id="ann-analyze-btn" onclick="annotateChart()">Identify & Annotate</button>
+        <button class="ann-clear-btn" onclick="clearAnnotator()">Clear Chart</button>
+        <button class="download-btn" id="ann-download-btn" onclick="downloadAnnotated()">Download Annotated Chart</button>
+      </div>
+
+      <div class="ai-panel">
+        <div class="ai-panel-title">Legend</div>
+        <div class="ann-legend">
+          <div class="ann-legend-item"><div class="ann-legend-dot" style="background:#3dbb7a"></div>Entry Zone</div>
+          <div class="ann-legend-item"><div class="ann-legend-dot" style="background:#e05555"></div>Stop Loss</div>
+          <div class="ann-legend-item"><div class="ann-legend-dot" style="background:#f0c060"></div>Take Profit</div>
+          <div class="ann-legend-item"><div class="ann-legend-dot" style="background:#4a9eff"></div>FVG</div>
+          <div class="ann-legend-item"><div class="ann-legend-dot" style="background:#a78bfa"></div>Order Block</div>
+          <div class="ann-legend-item"><div class="ann-legend-dot" style="background:#d4a843;opacity:0.6"></div>Liquidity</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas -->
+    <div>
+      <div class="ann-canvas-wrap" id="ann-canvas-wrap"
+        ondragover="event.preventDefault();this.style.borderColor='var(--gold)'"
+        ondragleave="this.style.borderColor=''"
+        ondrop="handleAnnDrop(event)">
+        <div class="ann-drop" id="ann-drop" onclick="document.getElementById('ann-file').click()">
+          <div class="ann-drop-icon">+</div>
+          <div style="font-size:13px;color:var(--text3)">Drop chart screenshot here</div>
+          <div style="font-size:11px;color:var(--text3)">or click to upload · PNG / JPG</div>
+        </div>
+        <canvas id="ann-canvas" class="ann-canvas" style="display:none"></canvas>
+      </div>
+      <input type="file" id="ann-file" accept="image/*" style="display:none" onchange="loadAnnChart(this.files[0])">
+
+      <div class="ann-legend" style="margin-top:8px" id="ann-detected-tags"></div>
+
+      <div class="ann-result" id="ann-result">
+        <span style="color:var(--text3)">Upload a chart screenshot and click Identify & Annotate. Claude will read the price action, mark ICT confluences, and draw the entry, SL and TP directly on the chart.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- SETTINGS MODAL -->
 <div class="modal-overlay" id="settings-modal">
   <div class="modal">
@@ -820,7 +1024,7 @@ function openTV(pair, tf) {
 }
 
 function populatePairSelects() {
-  ['cl-pair','f-pair','ai-pair','chart-pair-sel','pine-pair'].forEach(id => {
+  ['cl-pair','f-pair','ai-pair','chart-pair-sel','pine-pair','bt-pair','ann-pair'].forEach(id => {
     const el = document.getElementById(id); if (!el) return;
     const cur = el.value; el.innerHTML = '';
     pairs.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; el.appendChild(o); });
@@ -1314,10 +1518,488 @@ function calcPipValue() {
   document.getElementById('pv-50pip').textContent = '$' + (pipValue * 50).toFixed(2);
 }
 
+// ─── BACKTEST ─────────────────────────────────────────────────────────────────
+let btTrades = JSON.parse(localStorage.getItem('ict_bt_trades') || '[]');
+let btFormOpen = false;
+
+function saveBtState() { localStorage.setItem('ict_bt_trades', JSON.stringify(btTrades)); }
+
+function toggleBtForm() {
+  btFormOpen = !btFormOpen;
+  document.getElementById('bt-form').className = 'bt-form' + (btFormOpen ? ' open' : '');
+  if (btFormOpen) document.getElementById('bt-date').value = new Date().toISOString().split('T')[0];
+}
+
+function logBtTrade() {
+  const r = parseFloat(document.getElementById('bt-r').value);
+  btTrades.unshift({
+    id: Date.now(),
+    date: document.getElementById('bt-date').value || new Date().toISOString().split('T')[0],
+    pair: document.getElementById('bt-pair').value,
+    sess: document.getElementById('bt-sess').value,
+    setup: document.getElementById('bt-setup').value,
+    result: document.getElementById('bt-result').value.toLowerCase(),
+    r: isNaN(r) ? 0 : r,
+    notes: document.getElementById('bt-notes').value
+  });
+  saveBtState(); toggleBtForm(); renderBacktest();
+  showToast('Backtest trade logged', 'success');
+  document.getElementById('bt-r').value = '';
+  document.getElementById('bt-notes').value = '';
+}
+
+function deleteBtTrade(id) {
+  btTrades = btTrades.filter(t => t.id !== id);
+  saveBtState(); renderBacktest(); showToast('Removed');
+}
+
+function clearBtTrades() {
+  if (!confirm('Clear all backtest data?')) return;
+  btTrades = []; saveBtState(); renderBacktest(); showToast('Cleared');
+}
+
+function renderBacktest() {
+  const trades = [...btTrades].reverse(); // oldest first for equity curve
+  const total = btTrades.length;
+  const wins = btTrades.filter(t => t.result === 'win').length;
+  const losses = btTrades.filter(t => t.result === 'loss').length;
+  const wr = total ? Math.round(wins / total * 100) : 0;
+  const totalR = btTrades.reduce((a, t) => a + (t.result === 'win' ? t.r : t.result === 'loss' ? -1 : 0), 0);
+  const avgR = wins ? (btTrades.filter(t => t.result === 'win').reduce((a, t) => a + t.r, 0) / wins) : 0;
+  const pf = losses > 0 ? (btTrades.filter(t=>t.result==='win').reduce((a,t)=>a+t.r,0) / losses).toFixed(2) : '∞';
+
+  // Stats
+  document.getElementById('bt-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Trades</div><div class="stat-val neu">${total}</div></div>
+    <div class="stat-card"><div class="stat-label">Win Rate</div><div class="stat-val ${wr>=50?'pos':'neg'}">${wr}%</div></div>
+    <div class="stat-card"><div class="stat-label">Total R</div><div class="stat-val ${totalR>=0?'pos':'neg'}">${totalR>=0?'+':''}${totalR.toFixed(1)}R</div></div>
+    <div class="stat-card"><div class="stat-label">Avg Win R</div><div class="stat-val pos">+${avgR.toFixed(2)}R</div></div>`;
+
+  // Equity curve
+  const canvas = document.getElementById('bt-equity-chart');
+  if (canvas && total > 0) {
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth || 400;
+    canvas.height = 140;
+    const pts = [0]; let running = 0;
+    trades.forEach(t => { running += t.result==='win'?t.r:t.result==='loss'?-1:0; pts.push(running); });
+    const max = Math.max(...pts, 1), min = Math.min(...pts, 0);
+    const range = max - min || 1;
+    const w = canvas.width, h = canvas.height, pad = 20;
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = totalR >= 0 ? '#3dbb7a' : '#e05555';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    pts.forEach((v, i) => {
+      const x = pad + (i / (pts.length - 1 || 1)) * (w - pad * 2);
+      const y = h - pad - ((v - min) / range) * (h - pad * 2);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    // Zero line
+    const zeroY = h - pad - ((0 - min) / range) * (h - pad * 2);
+    ctx.strokeStyle = '#2a2f3d'; ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(pad, zeroY); ctx.lineTo(w - pad, zeroY); ctx.stroke();
+    ctx.setLineDash([]);
+    // Labels
+    ctx.fillStyle = '#555e75'; ctx.font = '10px Space Mono,monospace';
+    ctx.fillText('+' + max.toFixed(1) + 'R', 4, pad + 4);
+    ctx.fillText(min.toFixed(1) + 'R', 4, h - pad + 4);
+  } else if (canvas) {
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth || 400; canvas.height = 140;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#555e75'; ctx.font = '12px Syne,sans-serif';
+    ctx.fillText('Log trades to see equity curve', 20, 75);
+  }
+
+  // Bar chart helper
+  function renderBars(containerId, data) {
+    const el = document.getElementById(containerId); if (!el) return;
+    if (!data.length) { el.innerHTML = '<div style="font-size:12px;color:var(--text3);padding:8px 0">No data yet</div>'; return; }
+    const maxWr = Math.max(...data.map(d => d.wr), 1);
+    el.innerHTML = data.map(d => `
+      <div class="bt-bar-row">
+        <span class="bt-bar-label">${d.label}</span>
+        <div class="bt-bar-track"><div class="bt-bar-fill ${d.wr>=50?'':'low'}" style="width:${(d.wr/100)*100}%;background:${d.wr>=60?'var(--green)':d.wr>=40?'var(--gold)':'var(--red)'}"></div></div>
+        <span class="bt-bar-val">${d.wr}% <span style="color:var(--text3);font-size:10px">${d.n}t</span></span>
+      </div>`).join('');
+  }
+
+  // By session
+  const sessions = ['London','New York','Asian','Silver Bullet'];
+  const sessData = sessions.map(s => {
+    const group = btTrades.filter(t => t.sess === s);
+    const w = group.filter(t => t.result === 'win').length;
+    return {label: s.replace(' ','&nbsp;'), wr: group.length ? Math.round(w/group.length*100) : 0, n: group.length};
+  }).filter(d => d.n > 0);
+  renderBars('bt-session-bars', sessData);
+
+  // By pair
+  const pairData = [...new Set(btTrades.map(t => t.pair))].map(p => {
+    const group = btTrades.filter(t => t.pair === p);
+    const w = group.filter(t => t.result === 'win').length;
+    return {label: p, wr: Math.round(w/group.length*100), n: group.length};
+  }).sort((a,b) => b.wr - a.wr);
+  renderBars('bt-pair-bars', pairData);
+
+  // By setup
+  const setupData = [...new Set(btTrades.map(t => t.setup))].map(s => {
+    const group = btTrades.filter(t => t.setup === s);
+    const w = group.filter(t => t.result === 'win').length;
+    return {label: s.length > 16 ? s.slice(0,14)+'…' : s, wr: Math.round(w/group.length*100), n: group.length};
+  }).sort((a,b) => b.wr - a.wr);
+  renderBars('bt-setup-bars', setupData);
+
+  // Log table
+  const body = document.getElementById('bt-log-body');
+  if (!btTrades.length) {
+    body.innerHTML = '<tr><td colspan="8" class="empty-log">No backtest trades yet. Start logging past setups above.</td></tr>';
+    return;
+  }
+  body.innerHTML = btTrades.map(t => `
+    <tr>
+      <td style="font-family:'Space Mono',monospace;font-size:11px">${t.date}</td>
+      <td style="color:var(--gold2);font-family:'Space Mono',monospace;font-size:11px;font-weight:700">${t.pair}</td>
+      <td style="font-size:11px;color:var(--text2)">${t.sess}</td>
+      <td><span class="setup-tag">${t.setup}</span></td>
+      <td class="log-cell-${t.result}" style="font-family:'Space Mono',monospace;font-size:11px">${t.result.toUpperCase()}</td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:${t.result==='win'?'var(--green)':'var(--red)'}">${t.result==='win'?'+':''}${t.r}R</td>
+      <td class="notes-cell" title="${t.notes}" style="max-width:160px">${t.notes}</td>
+      <td><button class="ai-btn" onclick="reviewBtTrade(${t.id})">AI</button>
+          <button class="del-btn" style="margin-left:4px" onclick="deleteBtTrade(${t.id})">×</button></td>
+    </tr>`).join('');
+}
+
+async function reviewBtTrade(id) {
+  const t = btTrades.find(x => x.id === id);
+  if (!t) return;
+  document.getElementById('abt-name').value = t.setup;
+  document.getElementById('abt-rules').value = '';
+  document.getElementById('abt-pairs').value = t.pair;
+  document.getElementById('abt-sample').value = '1';
+  document.getElementById('abt-results').value = `Single trade: ${t.result.toUpperCase()}, ${t.r}R, ${t.sess} session. Notes: ${t.notes}`;
+  document.getElementById('tab-backtest').scrollTop = 9999;
+  await aiBacktest();
+}
+
+async function aiBacktest() {
+  const apiKey = getApiKey();
+  if (!apiKey) { openSettings(); return; }
+  const name = document.getElementById('abt-name').value;
+  const rules = document.getElementById('abt-rules').value;
+  const pairsUsed = document.getElementById('abt-pairs').value;
+  const sample = document.getElementById('abt-sample').value;
+  const results = document.getElementById('abt-results').value;
+
+  // Pull stats from logged bt trades if available
+  const total = btTrades.length;
+  const wins = btTrades.filter(t => t.result === 'win').length;
+  const wr = total ? Math.round(wins/total*100) : null;
+  const totalR = btTrades.reduce((a,t) => a+(t.result==='win'?t.r:t.result==='loss'?-1:0), 0);
+
+  const statsContext = total > 0
+    ? `\n\nLogged backtest data: ${total} trades, ${wr}% win rate, ${totalR.toFixed(1)}R total. Best session: ${getBestStat('sess')}. Best pair: ${getBestStat('pair')}. Best setup: ${getBestStat('setup')}.`
+    : '';
+
+  const out = document.getElementById('abt-output');
+  const btn = document.getElementById('abt-btn');
+  document.getElementById('abt-badges').innerHTML = '';
+  out.innerHTML = '<span class="ai-thinking">Analyzing backtest</span>';
+  btn.disabled = true;
+
+  const prompt = `You are an ICT trading coach reviewing a backtest. Give direct, specific feedback.\n\nSetup Name: ${name || 'Unnamed'}\nEntry Rules: ${rules || 'Not specified'}\nPairs: ${pairsUsed || 'Not specified'}\nSample Size: ${sample || 'Unknown'} trades\nResults: ${results || 'Not specified'}${statsContext}\n\nProvide:\n1. Setup viability grade (A/B/C/D)\n2. What the rules are doing well from an ICT perspective\n3. Weaknesses or rule gaps — what could cause false signals\n4. Specific refinements to improve win rate or R\n5. Minimum sample size recommendation before going live\n\nBe direct, ICT-specific, practical. Under 220 words. No markdown headers.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data = await res.json();
+    if (data.error) { out.innerHTML = `<span style="color:var(--red)">API Error: ${data.error.message}</span>`; btn.disabled=false; return; }
+    const text = data.content?.find(b => b.type==='text')?.text || 'No response.';
+    out.innerHTML = text.replace(/\n/g,'<br>');
+    const grade = text.match(/\b([ABCD])[- ](grade|setup|viability)/i)?.[1] || text.match(/Grade[:\s]+([ABCD])\b/i)?.[1] || 'B';
+    const badgeClass = grade==='A'?'badge-A':grade==='B'?'badge-B':'badge-C';
+    document.getElementById('abt-badges').innerHTML = `<span class="ai-score-badge ${badgeClass}">${grade} SETUP</span><span class="ai-score-badge" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border)">${sample||'?'} trades sampled</span>`;
+  } catch(e) {
+    out.innerHTML = `<span style="color:var(--red)">Request failed: ${e.message}</span>`;
+  }
+  btn.disabled = false;
+}
+
+function getBestStat(key) {
+  const groups = {};
+  btTrades.forEach(t => {
+    if (!groups[t[key]]) groups[t[key]] = {w:0,n:0};
+    groups[t[key]].n++;
+    if (t.result==='win') groups[t[key]].w++;
+  });
+  let best = null, bestWr = -1;
+  Object.entries(groups).forEach(([k,v]) => {
+    const wr = v.n >= 2 ? v.w/v.n : 0;
+    if (wr > bestWr) { bestWr = wr; best = k; }
+  });
+  return best ? `${best} (${Math.round(bestWr*100)}%)` : 'insufficient data';
+}
+
+// ─── CHART ANNOTATOR ─────────────────────────────────────────────────────────
+let annImageData = null;
+let annImageObj = null;
+
+function handleAnnDrop(e) {
+  e.preventDefault();
+  document.getElementById('ann-canvas-wrap').style.borderColor = '';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadAnnChart(file);
+}
+
+function loadAnnChart(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    annImageData = e.target.result;
+    const img = new Image();
+    img.onload = () => {
+      annImageObj = img;
+      const canvas = document.getElementById('ann-canvas');
+      const wrap = document.getElementById('ann-canvas-wrap');
+      const maxW = wrap.offsetWidth || 700;
+      const scale = Math.min(1, maxW / img.width);
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      document.getElementById('ann-drop').style.display = 'none';
+      canvas.style.display = 'block';
+      document.getElementById('ann-result').innerHTML = '<span style="color:var(--text3)">Chart loaded. Click Identify & Annotate to analyze.</span>';
+      document.getElementById('ann-detected-tags').innerHTML = '';
+      document.getElementById('ann-download-btn').style.display = 'none';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearAnnotator() {
+  annImageData = null; annImageObj = null;
+  const canvas = document.getElementById('ann-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  canvas.style.display = 'none';
+  document.getElementById('ann-drop').style.display = 'flex';
+  document.getElementById('ann-result').innerHTML = '<span style="color:var(--text3)">Upload a chart screenshot and click Identify & Annotate.</span>';
+  document.getElementById('ann-detected-tags').innerHTML = '';
+  document.getElementById('ann-download-btn').style.display = 'none';
+  document.getElementById('ann-file').value = '';
+}
+
+function downloadAnnotated() {
+  const canvas = document.getElementById('ann-canvas');
+  const link = document.createElement('a');
+  link.download = 'ictdesk-annotated-chart.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+async function annotateChart() {
+  const apiKey = getApiKey();
+  if (!apiKey) { openSettings(); return; }
+  if (!annImageData) { showToast('Upload a chart first', 'error'); return; }
+
+  const pair = document.getElementById('ann-pair').value;
+  const tf = document.getElementById('ann-tf').value;
+  const bias = document.getElementById('ann-bias').value;
+  const style = document.getElementById('ann-style').value;
+  const ctx_text = document.getElementById('ann-ctx').value;
+
+  const btn = document.getElementById('ann-analyze-btn');
+  const resultEl = document.getElementById('ann-result');
+  btn.disabled = true;
+  resultEl.innerHTML = '<span class="ann-thinking">Reading chart and identifying confluences</span>';
+  document.getElementById('ann-detected-tags').innerHTML = '';
+  document.getElementById('ann-download-btn').style.display = 'none';
+
+  const prompt = `You are an expert ICT (Inner Circle Trader) analyst. Analyze this ${tf} ${pair} chart and identify all visible ICT confluences, then provide precise annotation coordinates.
+
+Bias: ${bias}
+Entry Style: ${style}
+Context: ${ctx_text || 'none'}
+
+Respond ONLY with a valid JSON object — no markdown, no backticks, no explanation outside the JSON. Format:
+{
+  "grade": "A",
+  "bias": "Bullish",
+  "confluences": [
+    {"type": "FVG", "label": "Bullish FVG", "y_pct": 0.45, "height_pct": 0.04, "color": "#4a9eff"},
+    {"type": "OB", "label": "Demand OB", "y_pct": 0.55, "height_pct": 0.05, "color": "#a78bfa"},
+    {"type": "Liquidity", "label": "Buy-side Liq", "y_pct": 0.15, "height_pct": 0.01, "color": "#d4a843"},
+    {"type": "CHoCH", "label": "CHoCH", "y_pct": 0.40, "height_pct": 0.01, "color": "#f0c060"}
+  ],
+  "entry": {"y_pct": 0.52, "label": "Entry", "price_note": "Inside FVG / OTE zone"},
+  "sl": {"y_pct": 0.62, "label": "SL", "price_note": "Below OB low"},
+  "tp1": {"y_pct": 0.25, "label": "TP1", "price_note": "Previous high / liquidity"},
+  "tp2": {"y_pct": 0.10, "label": "TP2", "price_note": "Major liquidity pool"},
+  "rr": "1:3.2",
+  "entry_trigger": "Wait for displacement candle closing above FVG on 5M",
+  "analysis": "2-3 sentence ICT analysis of what you see and why this setup qualifies or doesn't"
+}
+
+y_pct is a decimal from 0 (top of chart) to 1 (bottom of chart). Be precise based on what you actually see. If you cannot identify a valid setup, still return the JSON with grade D and explain in analysis.`;
+
+  try {
+    const mediaType = annImageData.split(';')[0].split(':')[1];
+    const b64 = annImageData.split(',')[1];
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514', max_tokens: 1500,
+        messages: [{role:'user', content:[
+          {type:'image', source:{type:'base64', media_type:mediaType, data:b64}},
+          {type:'text', text:prompt}
+        ]}]
+      })
+    });
+    const data = await res.json();
+    if (data.error) { resultEl.innerHTML = `<span style="color:var(--red)">API Error: ${data.error.message}</span>`; btn.disabled=false; return; }
+    const raw = data.content?.find(b => b.type==='text')?.text || '';
+    let parsed;
+    try {
+      const clean = raw.replace(/```json|```/g,'').trim();
+      parsed = JSON.parse(clean);
+    } catch(e) {
+      resultEl.innerHTML = `<span style="color:var(--red)">Could not parse AI response. Try again.</span><br><span style="font-size:11px;color:var(--text3)">${raw.slice(0,200)}</span>`;
+      btn.disabled=false; return;
+    }
+    drawAnnotations(parsed);
+    showAnnotationResult(parsed);
+  } catch(e) {
+    resultEl.innerHTML = `<span style="color:var(--red)">Request failed: ${e.message}</span>`;
+  }
+  btn.disabled = false;
+}
+
+function drawAnnotations(data) {
+  const canvas = document.getElementById('ann-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  // Redraw original image
+  if (annImageObj) ctx.drawImage(annImageObj, 0, 0, W, H);
+
+  const drawHLine = (y_pct, color, label, lineWidth=2, dash=[]) => {
+    const y = y_pct * H;
+    ctx.save();
+    ctx.strokeStyle = color; ctx.lineWidth = lineWidth;
+    if (dash.length) ctx.setLineDash(dash);
+    ctx.globalAlpha = 0.9;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    ctx.setLineDash([]);
+    // Label
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = color;
+    const pad = 4, tw = ctx.measureText(label).width + pad*2 + 2;
+    ctx.font = 'bold 11px Space Mono, monospace';
+    const labelW = ctx.measureText(label).width + 12;
+    ctx.fillRect(W - labelW - 8, y - 10, labelW + 4, 18);
+    ctx.fillStyle = '#0a0c0f';
+    ctx.fillText(label, W - labelW - 6, y + 4);
+    ctx.restore();
+  };
+
+  const drawZone = (y_pct, h_pct, color, label) => {
+    const y = y_pct * H, h = h_pct * H;
+    ctx.save();
+    ctx.globalAlpha = 0.18;
+    ctx.fillStyle = color;
+    ctx.fillRect(0, y, W, h);
+    ctx.globalAlpha = 0.7;
+    ctx.strokeStyle = color; ctx.lineWidth = 1;
+    ctx.strokeRect(0, y, W, h);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = color;
+    ctx.font = 'bold 11px Space Mono, monospace';
+    ctx.fillText(label, 8, y + h/2 + 4);
+    ctx.restore();
+  };
+
+  // Draw confluences
+  if (data.confluences) {
+    data.confluences.forEach(c => {
+      if (c.height_pct > 0.015) drawZone(c.y_pct, c.height_pct, c.color, c.label);
+      else drawHLine(c.y_pct, c.color, c.label, 1, [6,4]);
+    });
+  }
+
+  // Entry zone
+  if (data.entry) {
+    drawHLine(data.entry.y_pct, '#3dbb7a', '▶ ENTRY', 2);
+  }
+
+  // SL
+  if (data.sl) {
+    drawHLine(data.sl.y_pct, '#e05555', '✕ SL', 2, [5,3]);
+  }
+
+  // TPs
+  if (data.tp1) drawHLine(data.tp1.y_pct, '#f0c060', '◆ TP1', 2, [5,3]);
+  if (data.tp2) drawHLine(data.tp2.y_pct, '#d4a843', '◆ TP2', 1, [8,4]);
+
+  // Grade badge top-left
+  const grade = data.grade || '?';
+  const gradeColor = grade==='A'?'#3dbb7a':grade==='B'?'#d4a843':grade==='C'?'#4a9eff':'#e05555';
+  ctx.save();
+  ctx.fillStyle = 'rgba(10,12,15,0.85)';
+  ctx.fillRect(8, 8, 110, 28);
+  ctx.fillStyle = gradeColor;
+  ctx.font = 'bold 13px Space Mono, monospace';
+  ctx.fillText(`ICT DESK  ${grade}`, 14, 27);
+  ctx.restore();
+
+  document.getElementById('ann-download-btn').style.display = 'block';
+}
+
+function showAnnotationResult(data) {
+  const resultEl = document.getElementById('ann-result');
+  const grade = data.grade || '?';
+  const gradeColor = grade==='A'?'var(--green)':grade==='B'?'var(--gold)':grade==='C'?'var(--blue)':'var(--red)';
+
+  let html = `<div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+    <span class="ai-score-badge badge-${grade==='A'?'A':grade==='B'?'B':'C'}">${grade} SETUP</span>
+    <span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gold)">${data.rr || ''} R:R</span>
+    <span style="font-family:'Space Mono',monospace;font-size:11px;color:${data.bias==='Bullish'?'var(--green)':'var(--red)'}">${data.bias || ''}</span>
+  </div>`;
+
+  if (data.analysis) html += `<div style="margin-bottom:10px;font-size:13px;color:var(--text2);line-height:1.7">${data.analysis}</div>`;
+
+  if (data.entry_trigger) html += `<div style="background:rgba(61,187,122,0.08);border:1px solid rgba(61,187,122,0.2);border-radius:4px;padding:8px 12px;font-size:12px;color:var(--green);margin-bottom:8px"><strong>Entry trigger:</strong> ${data.entry_trigger}</div>`;
+
+  const levels = [];
+  if (data.entry) levels.push(`<span style="color:var(--green)">Entry</span> — ${data.entry.price_note}`);
+  if (data.sl) levels.push(`<span style="color:var(--red)">SL</span> — ${data.sl.price_note}`);
+  if (data.tp1) levels.push(`<span style="color:var(--gold)">TP1</span> — ${data.tp1.price_note}`);
+  if (data.tp2) levels.push(`<span style="color:var(--gold2)">TP2</span> — ${data.tp2.price_note}`);
+  if (levels.length) html += `<div style="font-size:12px;line-height:2;font-family:'Space Mono',monospace">${levels.join('<br>')}</div>`;
+
+  resultEl.innerHTML = html;
+
+  // Tags
+  const tagsEl = document.getElementById('ann-detected-tags');
+  if (data.confluences && data.confluences.length) {
+    tagsEl.innerHTML = data.confluences.map(c =>
+      `<span style="font-size:10px;padding:2px 8px;border-radius:3px;background:var(--bg3);border:1px solid ${c.color};color:${c.color};font-family:'Space Mono',monospace">${c.type}</span>`
+    ).join('');
+  }
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 populatePairSelects();
 buildChecklist();
 renderJournal();
+renderBacktest();
 buildKillZones();
 buildNewsCalendar();
 updateClocks();
