@@ -17,6 +17,17 @@
   --green:#3dbb7a;--red:#e05555;--blue:#4a9eff;--purple:#a78bfa;
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;font-size:14px}
+
+/* PASSWORD GATE */
+.gate{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center}
+.gate-box{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:32px;width:100%;max-width:360px;text-align:center}
+.gate-logo{font-family:'Space Mono',monospace;font-size:16px;color:var(--gold);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
+.gate-sub{font-size:12px;color:var(--text3);margin-bottom:24px}
+.gate-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text);padding:10px 14px;font-family:'Space Mono',monospace;font-size:14px;text-align:center;letter-spacing:3px;margin-bottom:10px}
+.gate-input:focus{outline:none;border-color:var(--gold)}
+.gate-btn{width:100%;padding:10px;background:var(--gold3);border:1px solid var(--gold);color:var(--gold2);border-radius:4px;font-family:'Syne',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.15s}
+.gate-btn:hover{background:var(--gold);color:var(--bg)}
+.gate-err{font-size:12px;color:var(--red);margin-top:8px;min-height:18px;font-family:'Space Mono',monospace}
 .app{display:flex;flex-direction:column;min-height:100vh}
 
 /* HEADER */
@@ -326,7 +337,18 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
 </style>
 </head>
 <body>
-<div class="app">
+<!-- PASSWORD GATE -->
+<div class="gate" id="gate">
+  <div class="gate-box">
+    <div class="gate-logo">ICT Desk</div>
+    <div class="gate-sub">Private trading suite — enter password to continue</div>
+    <input class="gate-input" type="password" id="gate-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkGate()">
+    <button class="gate-btn" onclick="checkGate()">Unlock</button>
+    <div class="gate-err" id="gate-err"></div>
+  </div>
+</div>
+
+<div class="app" id="main-app" style="display:none">
 
 <!-- HEADER -->
 <div class="header">
@@ -987,7 +1009,38 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+</div><!-- end main-app -->
+
 <script>
+// ─── PASSWORD GATE ────────────────────────────────────────────────────────────
+const GATE_PASSWORD = 'ictdesk2024';
+const GATE_SESSION_KEY = 'ict_auth';
+
+function checkGate() {
+  const val = document.getElementById('gate-input').value;
+  const err = document.getElementById('gate-err');
+  if (val === GATE_PASSWORD) {
+    sessionStorage.setItem(GATE_SESSION_KEY, '1');
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('main-app').style.display = 'flex';
+    document.getElementById('main-app').style.flexDirection = 'column';
+    err.textContent = '';
+  } else {
+    err.textContent = 'Incorrect password';
+    document.getElementById('gate-input').value = '';
+    document.getElementById('gate-input').focus();
+  }
+}
+
+(function() {
+  if (sessionStorage.getItem(GATE_SESSION_KEY) === '1') {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('main-app').style.display = 'flex';
+    document.getElementById('main-app').style.flexDirection = 'column';
+  } else {
+    setTimeout(() => document.getElementById('gate-input').focus(), 100);
+  }
+})();
 // ─── STATE ───────────────────────────────────────────────────────────────────
 const DEFAULT_PAIRS = ['XAUUSD','AUDUSD','USDJPY','EURUSD','GBPUSD'];
 let pairs = JSON.parse(localStorage.getItem('ict_pairs') || JSON.stringify(DEFAULT_PAIRS));
