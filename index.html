@@ -233,7 +233,42 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
   .nav-btn{font-size:11px;padding:5px 10px}
 }
 
-/* ANNOTATOR */
+/* SCANNER */
+.scanner-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
+@media(max-width:800px){.scanner-grid{grid-template-columns:1fr}}
+.scanner-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.scanner-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
+.scan-btn{width:100%;padding:11px;background:var(--gold3);border:1px solid var(--gold);color:var(--gold2);border-radius:4px;font-family:'Syne',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;margin-top:12px}
+.scan-btn:hover{background:var(--gold);color:var(--bg)}
+.scan-btn:disabled{opacity:0.5;cursor:not-allowed}
+.auto-scan-row{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:8px 0;border-top:1px solid var(--border)}
+.toggle-switch{position:relative;width:36px;height:20px;cursor:pointer}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;background:var(--bg4);border-radius:20px;border:1px solid var(--border2);transition:0.2s}
+.toggle-track::before{content:'';position:absolute;width:14px;height:14px;left:2px;top:2px;background:var(--text3);border-radius:50%;transition:0.2s}
+.toggle-switch input:checked+.toggle-track{background:var(--gold3);border-color:var(--gold)}
+.toggle-switch input:checked+.toggle-track::before{transform:translateX(16px);background:var(--gold2)}
+.ohlc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.ohlc-cell{background:var(--bg3);border-radius:5px;padding:8px 10px}
+.ohlc-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:3px}
+.ohlc-val{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--text)}
+.ohlc-val.bull{color:var(--green)}.ohlc-val.bear{color:var(--red)}.ohlc-val.neu{color:var(--gold)}
+.candle-strip{display:flex;gap:4px;margin-bottom:12px;align-items:flex-end;height:60px}
+.candle-bar{flex:1;border-radius:2px 2px 0 0;min-height:4px;position:relative;cursor:default}
+.candle-bar.bull-bar{background:rgba(61,187,122,0.7);border:1px solid var(--green)}
+.candle-bar.bear-bar{background:rgba(224,85,85,0.7);border:1px solid var(--red)}
+.candle-bar.doji-bar{background:rgba(212,168,67,0.5);border:1px solid var(--gold)}
+.ema-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.ema-badge{font-size:11px;padding:4px 10px;border-radius:4px;font-family:'Space Mono',monospace;border:1px solid var(--border)}
+.signal-box{border-radius:6px;padding:14px;margin-bottom:10px;font-size:13px;line-height:1.7}
+.signal-box.bull{background:rgba(61,187,122,0.08);border:1px solid rgba(61,187,122,0.25);color:var(--text)}
+.signal-box.bear{background:rgba(224,85,85,0.08);border:1px solid rgba(224,85,85,0.25);color:var(--text)}
+.signal-box.neutral{background:var(--bg3);border:1px solid var(--border);color:var(--text2)}
+.scan-thinking{color:var(--text3);font-style:italic;font-family:'Space Mono',monospace;font-size:12px}
+.scan-thinking::after{content:'...';animation:dots 1.2s steps(3,end) infinite}
+.last-scan-time{font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;margin-top:6px}
+.td-warn{background:rgba(224,85,85,0.08);border:1px solid rgba(224,85,85,0.2);border-radius:6px;padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:12px}
+.td-warn button{background:none;border:none;color:var(--gold);cursor:pointer;font-family:'Syne',sans-serif;font-size:12px;text-decoration:underline;padding:0}
 .ann-layout{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
 @media(max-width:800px){.ann-layout{grid-template-columns:1fr}}
 .ann-canvas-wrap{position:relative;background:var(--bg3);border:1px solid var(--border);border-radius:8px;overflow:hidden;min-height:300px;display:flex;align-items:center;justify-content:center}
@@ -307,6 +342,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
     <button class="nav-btn" onclick="showTab('risk',this)">Risk Calc</button>
     <button class="nav-btn" onclick="showTab('backtest',this)">Backtest</button>
     <button class="nav-btn" onclick="showTab('annotator',this)">Annotator</button>
+    <button class="nav-btn" onclick="showTab('scanner',this)">Scanner</button>
   </div>
   <div class="header-right">
     <span id="api-dot" class="api-indicator"></span>
@@ -785,6 +821,20 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
             </select></div>
           <div class="form-group"><label class="form-label">Extra Context</label>
             <textarea class="form-textarea" id="ann-ctx" placeholder="e.g. Daily bias bullish, swept Asian lows, now in London KZ..." style="min-height:60px"></textarea></div>
+          <div class="form-group">
+            <label class="form-label">HTF Bias Chart (Daily/4H)</label>
+            <div style="border:1px dashed var(--border2);border-radius:6px;padding:10px;text-align:center;cursor:pointer;background:var(--bg3);transition:all 0.15s" id="htf-drop-zone"
+              onclick="document.getElementById('htf-file').click()"
+              ondragover="event.preventDefault();this.style.borderColor='var(--purple)'"
+              ondragleave="this.style.borderColor=''"
+              ondrop="handleHtfDrop(event)">
+              <div id="htf-preview-wrap">
+                <div style="font-size:12px;color:var(--text3);margin-bottom:2px">Drop Daily/4H chart here</div>
+                <div style="font-size:11px;color:var(--text3)">Optional · PNG / JPG</div>
+              </div>
+            </div>
+            <input type="file" id="htf-file" accept="image/*" style="display:none" onchange="loadHtfChart(this.files[0])">
+          </div>
         </div>
         <button class="ann-btn" id="ann-analyze-btn" onclick="annotateChart()">Identify & Annotate</button>
         <button class="ann-clear-btn" onclick="clearAnnotator()">Clear Chart</button>
@@ -828,6 +878,91 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
   </div>
 </div>
 
+<!-- SCANNER TAB -->
+<div class="content tab" id="tab-scanner">
+  <div id="td-warn-banner" class="td-warn" style="display:none">
+    No Twelve Data API key set. <button onclick="openSettings()">Add key in Settings →</button>
+  </div>
+  <div class="scanner-grid">
+
+    <!-- Controls -->
+    <div class="scanner-card">
+      <div class="scanner-title">Live Scanner</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="form-group"><label class="form-label">Pair</label><select class="inline-select" id="sc-pair"></select></div>
+        <div class="form-group"><label class="form-label">Timeframe</label>
+          <select class="inline-select" id="sc-tf">
+            <option value="1min">1M</option><option value="5min">5M</option>
+            <option value="15min" selected>15M</option><option value="1h">1H</option>
+            <option value="4h">4H</option><option value="1day">1D</option>
+          </select></div>
+        <div class="form-group"><label class="form-label">HTF Bias</label>
+          <select class="inline-select" id="sc-bias"><option>Bullish</option><option>Bearish</option><option>Neutral</option></select></div>
+        <div class="form-group"><label class="form-label">Active Confluences</label>
+          <div class="tag-row" id="sc-tags">
+            <span class="tag-toggle" onclick="toggleTag(this)">FVG</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">OB</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">Liq Sweep</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">BOS</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">CHoCH</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">OTE</span>
+            <span class="tag-toggle" onclick="toggleTag(this)">Kill Zone</span>
+          </div>
+        </div>
+      </div>
+      <button class="scan-btn" id="scan-btn" onclick="runScan()">Scan Current Candle</button>
+      <div class="auto-scan-row">
+        <span style="font-size:12px;color:var(--text2)">Auto-scan every candle close</span>
+        <label class="toggle-switch">
+          <input type="checkbox" id="auto-scan-toggle" onchange="toggleAutoScan()">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div class="last-scan-time" id="last-scan-time"></div>
+    </div>
+
+    <!-- Results -->
+    <div>
+      <!-- OHLC + Candles -->
+      <div class="scanner-card" style="margin-bottom:14px">
+        <div class="scanner-title">Live Data <span id="sc-live-pair" style="color:var(--gold);margin-left:8px"></span></div>
+        <div class="ohlc-grid" id="ohlc-grid">
+          <div class="ohlc-cell"><div class="ohlc-label">Open</div><div class="ohlc-val" id="sc-open">—</div></div>
+          <div class="ohlc-cell"><div class="ohlc-label">High</div><div class="ohlc-val bull" id="sc-high">—</div></div>
+          <div class="ohlc-cell"><div class="ohlc-label">Low</div><div class="ohlc-val bear" id="sc-low">—</div></div>
+          <div class="ohlc-cell"><div class="ohlc-label">Close</div><div class="ohlc-val" id="sc-close">—</div></div>
+          <div class="ohlc-cell"><div class="ohlc-label">ATR (14)</div><div class="ohlc-val neu" id="sc-atr">—</div></div>
+          <div class="ohlc-cell"><div class="ohlc-label">Candle</div><div class="ohlc-val" id="sc-candle-type">—</div></div>
+        </div>
+        <div style="font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Last 5 Candles</div>
+        <div class="candle-strip" id="candle-strip">
+          <div style="font-size:11px;color:var(--text3);align-self:center">Scan to load candles</div>
+        </div>
+        <div class="ema-row" id="ema-row">
+          <span class="ema-badge" id="ema20-badge">EMA 20: —</span>
+          <span class="ema-badge" id="ema50-badge">EMA 50: —</span>
+          <span class="ema-badge" id="ema-trend-badge">Trend: —</span>
+        </div>
+      </div>
+
+      <!-- AI Verdict -->
+      <div class="scanner-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div class="scanner-title" style="margin-bottom:0">AI Verdict</div>
+          <div id="sc-badges" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+        </div>
+        <div class="signal-box neutral" id="sc-verdict">
+          <span style="color:var(--text3)">Hit Scan to get a live ICT verdict on the current candle.</span>
+        </div>
+        <div style="font-size:11px;color:var(--text3);line-height:1.7;margin-top:8px">
+          Data from Twelve Data · Analysis by Claude · Always confirm on your own chart before entering.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- SETTINGS MODAL -->
 <div class="modal-overlay" id="settings-modal">
   <div class="modal">
@@ -836,9 +971,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
     <div class="modal-sub">Your API key is stored locally in your browser only — never sent to any server other than Anthropic directly.</div>
     <label class="modal-label">Anthropic API Key</label>
     <input class="modal-input" type="password" id="api-key-input" placeholder="sk-ant-...">
+    <label class="modal-label" style="margin-top:4px">Twelve Data API Key (for live scanner)</label>
+    <input class="modal-input" type="password" id="td-key-input" placeholder="your_twelvedata_key">
     <div class="modal-actions">
-      <button class="btn primary" onclick="saveApiKey()">Save Key</button>
-      <button class="btn danger" onclick="clearApiKey()">Remove Key</button>
+      <button class="btn primary" onclick="saveApiKey()">Save Keys</button>
+      <button class="btn danger" onclick="clearApiKey()">Remove Keys</button>
     </div>
     <div class="modal-info">
       Don't have an API key? Get one free at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.
@@ -869,19 +1006,24 @@ function saveState() {
 
 // ─── API KEY ─────────────────────────────────────────────────────────────────
 function getApiKey() { return localStorage.getItem('ict_api_key') || ''; }
+function getTDKey() { return localStorage.getItem('ict_td_key') || ''; }
 function saveApiKey() {
   const val = document.getElementById('api-key-input').value.trim();
-  if (!val) { showToast('Enter a key first', 'error'); return; }
-  localStorage.setItem('ict_api_key', val);
+  const tdVal = document.getElementById('td-key-input').value.trim();
+  if (!val && !tdVal) { showToast('Enter at least one key', 'error'); return; }
+  if (val) localStorage.setItem('ict_api_key', val);
+  if (tdVal) localStorage.setItem('ict_td_key', tdVal);
   updateApiIndicator();
   closeSettings();
-  showToast('API key saved', 'success');
+  showToast('Keys saved', 'success');
 }
 function clearApiKey() {
   localStorage.removeItem('ict_api_key');
+  localStorage.removeItem('ict_td_key');
   document.getElementById('api-key-input').value = '';
+  document.getElementById('td-key-input').value = '';
   updateApiIndicator();
-  showToast('API key removed');
+  showToast('Keys removed');
 }
 function updateApiIndicator() {
   const dot = document.getElementById('api-dot');
@@ -889,9 +1031,12 @@ function updateApiIndicator() {
   dot.className = 'api-indicator' + (has ? ' set' : '');
   const banner = document.getElementById('no-api-banner');
   if (banner) banner.style.display = has ? 'none' : 'block';
+  const tdBanner = document.getElementById('td-warn-banner');
+  if (tdBanner) tdBanner.style.display = getTDKey() ? 'none' : 'block';
 }
 function openSettings() {
   document.getElementById('api-key-input').value = getApiKey();
+  document.getElementById('td-key-input').value = getTDKey();
   document.getElementById('settings-modal').classList.add('open');
 }
 function closeSettings() { document.getElementById('settings-modal').classList.remove('open'); }
@@ -913,6 +1058,7 @@ function showTab(name, el) {
   if (el) el.classList.add('active');
   if (name === 'chart') setTimeout(loadTVChart, 100);
   if (name === 'analyzer') updateApiIndicator();
+  if (name === 'scanner') updateApiIndicator();
 }
 
 // ─── SESSIONS & CLOCKS ───────────────────────────────────────────────────────
@@ -1024,7 +1170,7 @@ function openTV(pair, tf) {
 }
 
 function populatePairSelects() {
-  ['cl-pair','f-pair','ai-pair','chart-pair-sel','pine-pair','bt-pair','ann-pair'].forEach(id => {
+  ['cl-pair','f-pair','ai-pair','chart-pair-sel','pine-pair','bt-pair','ann-pair','sc-pair'].forEach(id => {
     const el = document.getElementById(id); if (!el) return;
     const cur = el.value; el.innerHTML = '';
     pairs.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; el.appendChild(o); });
@@ -1748,6 +1894,44 @@ function getBestStat(key) {
 // ─── CHART ANNOTATOR ─────────────────────────────────────────────────────────
 let annImageData = null;
 let annImageObj = null;
+let htfImageData = null;
+
+function handleHtfDrop(e) {
+  e.preventDefault();
+  document.getElementById('htf-drop-zone').style.borderColor = '';
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadHtfChart(file);
+}
+
+function loadHtfChart(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    htfImageData = e.target.result;
+    const wrap = document.getElementById('htf-preview-wrap');
+    wrap.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px">
+        <img src="${htfImageData}" style="width:48px;height:36px;object-fit:cover;border-radius:3px;border:1px solid var(--border)">
+        <div>
+          <div style="font-size:11px;color:var(--green)">HTF chart loaded</div>
+          <div style="font-size:10px;color:var(--text3);cursor:pointer" onclick="clearHtfChart(event)">Remove ×</div>
+        </div>
+      </div>`;
+    document.getElementById('htf-drop-zone').style.borderColor = 'rgba(61,187,122,0.4)';
+    showToast('HTF bias chart added', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearHtfChart(e) {
+  e.stopPropagation();
+  htfImageData = null;
+  document.getElementById('htf-file').value = '';
+  document.getElementById('htf-drop-zone').style.borderColor = '';
+  document.getElementById('htf-preview-wrap').innerHTML = `
+    <div style="font-size:12px;color:var(--text3);margin-bottom:2px">Drop Daily/4H chart here</div>
+    <div style="font-size:11px;color:var(--text3)">Optional · PNG / JPG</div>`;
+}
 
 function handleAnnDrop(e) {
   e.preventDefault();
@@ -1784,7 +1968,7 @@ function loadAnnChart(file) {
 }
 
 function clearAnnotator() {
-  annImageData = null; annImageObj = null;
+  annImageData = null; annImageObj = null; htfImageData = null;
   const canvas = document.getElementById('ann-canvas');
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -1794,6 +1978,7 @@ function clearAnnotator() {
   document.getElementById('ann-detected-tags').innerHTML = '';
   document.getElementById('ann-download-btn').style.display = 'none';
   document.getElementById('ann-file').value = '';
+  clearHtfChart({stopPropagation:()=>{}});
 }
 
 function downloadAnnotated() {
@@ -1822,16 +2007,18 @@ async function annotateChart() {
   document.getElementById('ann-detected-tags').innerHTML = '';
   document.getElementById('ann-download-btn').style.display = 'none';
 
-  const prompt = `You are an expert ICT (Inner Circle Trader) analyst. Analyze this ${tf} ${pair} chart and identify all visible ICT confluences, then provide precise annotation coordinates.
+  const prompt = `You are an expert ICT (Inner Circle Trader) analyst. Analyze this ${tf} ${pair} chart${htfImageData ? ' alongside the HTF bias chart provided' : ''} and identify all visible ICT confluences, then provide precise annotation coordinates.
 
 Bias: ${bias}
 Entry Style: ${style}
 Context: ${ctx_text || 'none'}
+${htfImageData ? 'Note: A higher timeframe (Daily/4H) bias chart has been provided as the first image. Use it to confirm the HTF narrative before analyzing the entry timeframe chart (second image).' : ''}
 
 Respond ONLY with a valid JSON object — no markdown, no backticks, no explanation outside the JSON. Format:
 {
   "grade": "A",
   "bias": "Bullish",
+  "htf_narrative": "Brief HTF context if bias chart was provided, otherwise empty string",
   "confluences": [
     {"type": "FVG", "label": "Bullish FVG", "y_pct": 0.45, "height_pct": 0.04, "color": "#4a9eff"},
     {"type": "OB", "label": "Demand OB", "y_pct": 0.55, "height_pct": 0.05, "color": "#a78bfa"},
@@ -1852,16 +2039,20 @@ y_pct is a decimal from 0 (top of chart) to 1 (bottom of chart). Be precise base
   try {
     const mediaType = annImageData.split(';')[0].split(':')[1];
     const b64 = annImageData.split(',')[1];
+
+    // Build content array — HTF chart first if present, then entry chart
+    const contentImages = [];
+    if (htfImageData) {
+      const htfMedia = htfImageData.split(';')[0].split(':')[1];
+      const htfB64 = htfImageData.split(',')[1];
+      contentImages.push({type:'image', source:{type:'base64', media_type:htfMedia, data:htfB64}});
+    }
+    contentImages.push({type:'image', source:{type:'base64', media_type:mediaType, data:b64}});
+    contentImages.push({type:'text', text:prompt});
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514', max_tokens: 1500,
-        messages: [{role:'user', content:[
-          {type:'image', source:{type:'base64', media_type:mediaType, data:b64}},
-          {type:'text', text:prompt}
-        ]}]
-      })
+      body: JSON.stringify({model:'claude-sonnet-4-20250514', max_tokens:1500, messages:[{role:'user', content:contentImages}]})
     });
     const data = await res.json();
     if (data.error) { resultEl.innerHTML = `<span style="color:var(--red)">API Error: ${data.error.message}</span>`; btn.disabled=false; return; }
@@ -1973,6 +2164,7 @@ function showAnnotationResult(data) {
     <span style="font-family:'Space Mono',monospace;font-size:11px;color:${data.bias==='Bullish'?'var(--green)':'var(--red)'}">${data.bias || ''}</span>
   </div>`;
 
+  if (data.htf_narrative) html += `<div style="background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:4px;padding:8px 12px;font-size:12px;color:var(--purple);margin-bottom:8px"><strong>HTF narrative:</strong> ${data.htf_narrative}</div>`;
   if (data.analysis) html += `<div style="margin-bottom:10px;font-size:13px;color:var(--text2);line-height:1.7">${data.analysis}</div>`;
 
   if (data.entry_trigger) html += `<div style="background:rgba(61,187,122,0.08);border:1px solid rgba(61,187,122,0.2);border-radius:4px;padding:8px 12px;font-size:12px;color:var(--green);margin-bottom:8px"><strong>Entry trigger:</strong> ${data.entry_trigger}</div>`;
@@ -1992,6 +2184,197 @@ function showAnnotationResult(data) {
     tagsEl.innerHTML = data.confluences.map(c =>
       `<span style="font-size:10px;padding:2px 8px;border-radius:3px;background:var(--bg3);border:1px solid ${c.color};color:${c.color};font-family:'Space Mono',monospace">${c.type}</span>`
     ).join('');
+  }
+}
+
+// ─── LIVE SCANNER ─────────────────────────────────────────────────────────────
+let autoScanInterval = null;
+let lastScanData = null;
+
+const TD_SYMBOL_MAP = {
+  XAUUSD:'XAU/USD', AUDUSD:'AUD/USD', USDJPY:'USD/JPY',
+  EURUSD:'EUR/USD', GBPUSD:'GBP/USD', BTCUSD:'BTC/USD', ETHUSD:'ETH/USD'
+};
+function tdSymbol(p) { return TD_SYMBOL_MAP[p] || p.slice(0,3)+'/'+p.slice(3); }
+
+function toggleAutoScan() {
+  const on = document.getElementById('auto-scan-toggle').checked;
+  if (on) {
+    const tfSecs = {
+      '1min':60,'5min':300,'15min':900,'1h':3600,'4h':14400,'1day':86400
+    };
+    const tf = document.getElementById('sc-tf').value;
+    const ms = (tfSecs[tf] || 900) * 1000;
+    runScan();
+    autoScanInterval = setInterval(runScan, ms);
+    showToast('Auto-scan on — every ' + document.getElementById('sc-tf').options[document.getElementById('sc-tf').selectedIndex].text, 'success');
+  } else {
+    clearInterval(autoScanInterval);
+    autoScanInterval = null;
+    showToast('Auto-scan off');
+  }
+}
+
+async function fetchTDData(symbol, tf, tdKey) {
+  const base = 'https://api.twelvedata.com';
+  const params = `symbol=${encodeURIComponent(symbol)}&interval=${tf}&apikey=${tdKey}`;
+
+  const [candleRes, emaRes20, emaRes50, atrRes] = await Promise.all([
+    fetch(`${base}/time_series?${params}&outputsize=6`),
+    fetch(`${base}/ema?${params}&time_period=20&outputsize=1`),
+    fetch(`${base}/ema?${params}&time_period=50&outputsize=1`),
+    fetch(`${base}/atr?${params}&time_period=14&outputsize=1`)
+  ]);
+
+  const [candles, ema20, ema50, atr] = await Promise.all([
+    candleRes.json(), emaRes20.json(), emaRes50.json(), atrRes.json()
+  ]);
+
+  if (candles.status === 'error') throw new Error(candles.message || 'Twelve Data error');
+
+  return { candles: candles.values || [], ema20, ema50, atr };
+}
+
+async function runScan() {
+  const tdKey = getTDKey();
+  const apiKey = getApiKey();
+  if (!tdKey) { openSettings(); return; }
+  if (!apiKey) { openSettings(); return; }
+
+  const pair = document.getElementById('sc-pair').value;
+  const tf = document.getElementById('sc-tf').value;
+  const bias = document.getElementById('sc-bias').value;
+  const tags = [...document.querySelectorAll('#sc-tags .tag-toggle.on')].map(t => t.textContent);
+
+  const btn = document.getElementById('scan-btn');
+  const verdict = document.getElementById('sc-verdict');
+  btn.disabled = true;
+  verdict.className = 'signal-box neutral';
+  verdict.innerHTML = '<span class="scan-thinking">Fetching live data</span>';
+  document.getElementById('sc-badges').innerHTML = '';
+
+  try {
+    const sym = tdSymbol(pair);
+    const raw = await fetchTDData(sym, tf, tdKey);
+    const candles = raw.candles;
+    if (!candles.length) throw new Error('No candle data returned. Check pair/timeframe.');
+
+    const current = candles[0];
+    const prev5 = candles.slice(0, 5);
+    const o = parseFloat(current.open), h = parseFloat(current.high);
+    const l = parseFloat(current.low), c = parseFloat(current.close);
+    const ema20val = raw.ema20?.values?.[0]?.ema;
+    const ema50val = raw.ema50?.values?.[0]?.ema;
+    const atrVal = raw.atr?.values?.[0]?.atr;
+
+    // Update OHLC display
+    document.getElementById('sc-live-pair').textContent = pair;
+    document.getElementById('sc-open').textContent = o.toFixed(5);
+    document.getElementById('sc-high').textContent = h.toFixed(5);
+    document.getElementById('sc-low').textContent = l.toFixed(5);
+    const closeEl = document.getElementById('sc-close');
+    closeEl.textContent = c.toFixed(5);
+    closeEl.className = 'ohlc-val' + (c > o ? ' bull' : c < o ? ' bear' : ' neu');
+    document.getElementById('sc-atr').textContent = atrVal ? parseFloat(atrVal).toFixed(5) : '—';
+
+    // Candle type
+    const body = Math.abs(c - o), range = h - l;
+    const candleType = body < range * 0.15 ? 'Doji' : body > range * 0.6 ? (c > o ? 'Bullish Engulf' : 'Bearish Engulf') : c > o ? 'Bullish' : 'Bearish';
+    const ctEl = document.getElementById('sc-candle-type');
+    ctEl.textContent = candleType;
+    ctEl.className = 'ohlc-val' + (c > o ? ' bull' : c < o ? ' bear' : ' neu');
+
+    // 5 candle strip
+    const strip = document.getElementById('candle-strip');
+    strip.innerHTML = '';
+    const closes = prev5.map(c => parseFloat(c.close));
+    const highs = prev5.map(c => parseFloat(c.high));
+    const lows = prev5.map(c => parseFloat(c.low));
+    const maxH = Math.max(...highs), minL = Math.min(...lows), rng = maxH - minL || 1;
+    [...prev5].reverse().forEach((cd, i) => {
+      const co = parseFloat(cd.open), cc = parseFloat(cd.close);
+      const ch = parseFloat(cd.high), cl = parseFloat(cd.low);
+      const heightPct = Math.max(5, ((ch - cl) / rng) * 100);
+      const bull = cc >= co;
+      const div = document.createElement('div');
+      div.className = 'candle-bar ' + (Math.abs(cc-co)/(ch-cl||1) < 0.15 ? 'doji-bar' : bull ? 'bull-bar' : 'bear-bar');
+      div.style.height = heightPct + '%';
+      div.title = `O:${co.toFixed(4)} H:${ch.toFixed(4)} L:${cl.toFixed(4)} C:${cc.toFixed(4)}`;
+      strip.appendChild(div);
+    });
+
+    // EMA badges
+    if (ema20val) {
+      const e20 = parseFloat(ema20val), e50 = ema50val ? parseFloat(ema50val) : null;
+      const ema20El = document.getElementById('ema20-badge');
+      ema20El.textContent = 'EMA20: ' + e20.toFixed(4);
+      ema20El.style.cssText = `color:${c > e20 ? 'var(--green)' : 'var(--red)'};border-color:${c > e20 ? 'rgba(61,187,122,0.3)' : 'rgba(224,85,85,0.3)'}`;
+      if (e50) {
+        const ema50El = document.getElementById('ema50-badge');
+        ema50El.textContent = 'EMA50: ' + e50.toFixed(4);
+        ema50El.style.cssText = `color:${c > e50 ? 'var(--green)' : 'var(--red)'};border-color:${c > e50 ? 'rgba(61,187,122,0.3)' : 'rgba(224,85,85,0.3)'}`;
+        const trend = c > e20 && e20 > e50 ? 'Bullish' : c < e20 && e20 < e50 ? 'Bearish' : 'Mixed';
+        const trendEl = document.getElementById('ema-trend-badge');
+        trendEl.textContent = 'Trend: ' + trend;
+        trendEl.style.cssText = `color:${trend==='Bullish'?'var(--green)':trend==='Bearish'?'var(--red)':'var(--gold)'};border-color:${trend==='Bullish'?'rgba(61,187,122,0.3)':trend==='Bearish'?'rgba(224,85,85,0.3)':'rgba(212,168,67,0.3)'}`;
+      }
+    }
+
+    lastScanData = { pair, tf, bias, tags, o, h, l, c, ema20val, ema50val, atrVal, candleType, prev5 };
+    document.getElementById('last-scan-time').textContent = 'Last scan: ' + new Date().toUTCString().slice(17,25) + ' UTC';
+
+    // Now ask Claude for verdict
+    verdict.className = 'signal-box neutral';
+    verdict.innerHTML = '<span class="scan-thinking">Analyzing with Claude</span>';
+    await getClaudeVerdict(lastScanData);
+
+  } catch(e) {
+    verdict.className = 'signal-box neutral';
+    verdict.innerHTML = `<span style="color:var(--red)">Error: ${e.message}</span>`;
+  }
+  btn.disabled = false;
+}
+
+async function getClaudeVerdict(d) {
+  const apiKey = getApiKey();
+  const prev5Str = d.prev5.map((c,i) => {
+    const o=parseFloat(c.open),cl=parseFloat(c.close),h=parseFloat(c.high),l=parseFloat(c.low);
+    return `C${i+1}(${c.datetime?.slice(11,16)||''}): O${o.toFixed(4)} H${h.toFixed(4)} L${l.toFixed(4)} C${cl.toFixed(4)} ${cl>=o?'▲':'▼'}`;
+  }).join(' | ');
+
+  const emaContext = d.ema20val
+    ? `EMA20: ${parseFloat(d.ema20val).toFixed(4)} | EMA50: ${d.ema50val ? parseFloat(d.ema50val).toFixed(4) : 'N/A'} | Price vs EMA20: ${d.c > parseFloat(d.ema20val) ? 'ABOVE (bullish)' : 'BELOW (bearish)'}`
+    : 'EMA data unavailable';
+
+  const atrContext = d.atrVal
+    ? `ATR(14): ${parseFloat(d.atrVal).toFixed(5)} — suggested SL buffer: ${(parseFloat(d.atrVal) * 1.5).toFixed(5)}`
+    : '';
+
+  const prompt = `You are an ICT trading coach. Analyze this live candle data and give a direct verdict.\n\nPair: ${d.pair} | Timeframe: ${d.tf} | HTF Bias: ${d.bias}\nActive confluences marked by trader: ${d.tags.join(', ') || 'none'}\n\nCurrent candle: O${d.o.toFixed(5)} H${d.h.toFixed(5)} L${d.l.toFixed(5)} C${d.c.toFixed(5)} — ${d.candleType}\nLast 5 candles (newest first): ${prev5Str}\n${emaContext}\n${atrContext}\n\nProvide a concise verdict:\n1. Signal: LONG / SHORT / WAIT — one word with brief reason\n2. What the candle structure suggests (1-2 sentences)\n3. Entry condition to watch for\n4. Suggested SL based on ATR\n5. Caution or invalidation level\n\nBe direct. Under 150 words. No headers.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,messages:[{role:'user',content:prompt}]})
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const text = data.content?.find(b => b.type==='text')?.text || '';
+    const isLong = /signal[:\s]+LONG|^LONG/im.test(text);
+    const isShort = /signal[:\s]+SHORT|^SHORT/im.test(text);
+    const isWait = /signal[:\s]+WAIT|^WAIT/im.test(text);
+    const boxClass = isLong ? 'bull' : isShort ? 'bear' : 'neutral';
+    const verdict = document.getElementById('sc-verdict');
+    verdict.className = 'signal-box ' + boxClass;
+    verdict.innerHTML = text.replace(/\n/g,'<br>');
+    const signal = isLong ? 'LONG' : isShort ? 'SHORT' : 'WAIT';
+    const sigColor = isLong ? 'badge-A' : isShort ? 'badge-C' : 'badge-B';
+    document.getElementById('sc-badges').innerHTML = `
+      <span class="ai-score-badge ${sigColor}">${signal}</span>
+      <span class="ai-score-badge" style="background:var(--bg3);color:var(--text2);border:1px solid var(--border)">${d.pair} · ${d.tf}</span>`;
+  } catch(e) {
+    document.getElementById('sc-verdict').innerHTML = `<span style="color:var(--red)">Claude error: ${e.message}</span>`;
   }
 }
 
