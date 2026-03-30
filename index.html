@@ -1608,50 +1608,33 @@ async function loadNewsCalendar(forceRefresh = false) {
   body.innerHTML = '';
 
   try {
-    // Use TradingEconomics calendar via allorigins CORS proxy — free, no key
-    const today = new Date();
-    const monday = new Date(today);
-    monday.setUTCDate(today.getUTCDate() - ((today.getUTCDay() + 6) % 7));
-    const sunday = new Date(monday);
-    sunday.setUTCDate(monday.getUTCDate() + 6);
-    const fmt = d => d.toISOString().split('T')[0];
-
-    // Fetch from Trading Economics free calendar JSON
-    const url = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://tradingeconomics.com/calendar/json?c=guest:guest&d1=${fmt(monday)}&d2=${fmt(sunday)}&importance=3`)}`;
-    const res = await fetch(url);
+    const res = await fetch(`/api/news?v=${Date.now()}`, {
+      signal: AbortSignal.timeout(12000),
+      cache: 'no-store'
+    });
     const data = await res.json();
-    const events = JSON.parse(data.contents);
 
-    allNewsEvents = events.map(e => ({
-      date: e.Date || e.date || '',
-      currency: e.Currency || e.currency || '',
-      event: e.Event || e.event || e.Indicator || '',
-      impact: 3,
-      actual: e.Actual ?? e.actual ?? '',
-      forecast: e.Forecast ?? e.forecast ?? e.TEForecast ?? '',
-      previous: e.Previous ?? e.previous ?? '',
-    })).filter(e => e.currency && e.event);
-
-    renderNewsTable();
-    document.getElementById('news-last-updated').textContent = 'Updated ' + new Date().toUTCString().slice(17,22) + ' UTC';
-
+    if (data.ok && data.events.length > 0) {
+      allNewsEvents = data.events;
+      const src = data.source === 'forexfactory' ? 'Forex Factory' : 'Trading Economics';
+      document.getElementById('news-last-updated').textContent = `Live · ${src} · ${new Date().toUTCString().slice(17,22)} UTC`;
+      showToast('News loaded', 'success');
+    } else {
+      throw new Error('No events returned');
+    }
   } catch(e) {
-    // Fallback to built-in recurring schedule if API fails
+    // Fallback to static recurring schedule
     allNewsEvents = getWeeklyNews().map(ev => ({
       date: ev.time.toISOString(),
-      currency: ev.cur,
-      event: ev.name,
-      impact: 3,
-      actual: '',
-      forecast: '',
-      previous: '',
-      _static: true
+      currency: ev.cur, event: ev.name,
+      actual: '', forecast: '', previous: '', _static: true
     }));
-    renderNewsTable();
-    document.getElementById('news-last-updated').textContent = 'Live fetch failed — showing recurring schedule';
+    document.getElementById('news-last-updated').textContent = 'Offline — recurring schedule';
+    showToast('Live data unavailable — showing recurring schedule', 'error');
   }
 
   loading.style.display = 'none';
+  renderNewsTable();
   updateNewsCountdown();
 }
 
