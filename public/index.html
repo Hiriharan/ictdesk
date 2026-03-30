@@ -1616,9 +1616,9 @@ async function loadNewsCalendar(forceRefresh = false) {
 
     if (data.ok && data.events.length > 0) {
       allNewsEvents = data.events;
-      const src = data.source === 'forexfactory' ? 'Forex Factory' : 'Trading Economics';
-      document.getElementById('news-last-updated').textContent = `Live · ${src} · ${new Date().toUTCString().slice(17,22)} UTC`;
-      showToast('News loaded', 'success');
+      const src = data.source === 'forexfactory' ? 'Forex Factory' : data.source === 'tradingeconomics' ? 'Trading Economics' : 'Recurring Schedule';
+      document.getElementById('news-last-updated').textContent = `${data.source !== 'static' ? 'Live · ' : ''}${src} · ${new Date().toUTCString().slice(17,22)} UTC`;
+      if (data.source !== 'static') showToast('News loaded', 'success');
     } else {
       throw new Error('No events returned');
     }
