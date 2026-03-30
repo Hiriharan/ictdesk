@@ -299,6 +299,48 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
 .download-btn:hover{background:rgba(74,158,255,0.2)}
 .ann-thinking{color:var(--text3);font-style:italic;font-family:'Space Mono',monospace;font-size:12px}
 .ann-thinking::after{content:'...';animation:dots 1.2s steps(3,end) infinite}
+
+/* TOP-DOWN GUIDE */
+.td-pair-tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px}
+.td-pair-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);padding:6px 14px;border-radius:4px;cursor:pointer;font-family:'Space Mono',monospace;font-size:11px;transition:all 0.15s}
+.td-pair-btn:hover{border-color:var(--gold);color:var(--gold)}
+.td-pair-btn.active{background:var(--gold3);border-color:var(--gold);color:var(--gold2)}
+.td-flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:16px;align-items:start}
+@media(max-width:800px){.td-flow{grid-template-columns:1fr 1fr}}
+.td-tf-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:14px}
+.td-tf-card.active-tf{border-color:var(--gold);background:rgba(212,168,67,0.05)}
+.td-tf-label{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--gold);margin-bottom:4px}
+.td-tf-role{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.td-tf-tasks{display:flex;flex-direction:column;gap:5px}
+.td-tf-task{font-size:11px;color:var(--text2);padding:5px 8px;background:var(--bg3);border-radius:4px;border-left:2px solid var(--border2);line-height:1.5}
+.td-tf-task.key{border-left-color:var(--gold);color:var(--text)}
+.td-arrow{display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:20px;padding-top:28px}
+.td-checklist-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:700px){.td-checklist-wrap{grid-template-columns:1fr}}
+.td-checklist-section{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.td-section-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.td-check-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.1s}
+.td-check-row:last-child{border-bottom:none}
+.td-check-row:hover{opacity:0.85}
+.td-checkbox{width:18px;height:18px;border:1px solid var(--border2);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all 0.15s;font-size:11px;color:var(--gold2)}
+.td-checkbox.on{background:var(--gold3);border-color:var(--gold)}
+.td-check-label{font-size:12px;color:var(--text);margin-bottom:2px;line-height:1.4}
+.td-check-sub{font-size:11px;color:var(--text3);line-height:1.5}
+.td-score-bar-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
+.td-verdict{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.td-score-num{font-family:'Space Mono',monospace;font-size:32px;font-weight:700}
+.td-go{color:var(--green)}.td-caution{color:var(--gold)}.td-no{color:var(--red)}
+.td-verdict-msg{font-size:13px;line-height:1.7;color:var(--text2);flex:1}
+.td-reset-btn{font-size:11px;padding:5px 12px;border-radius:4px;border:1px solid var(--border2);background:transparent;color:var(--text3);cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:1px;text-transform:uppercase;transition:all 0.15s}
+.td-reset-btn:hover{border-color:var(--red);color:var(--red)}
+.td-pair-info{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+@media(max-width:600px){.td-pair-info{grid-template-columns:1fr 1fr}}
+.td-info-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.td-info-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:5px}
+.td-info-val{font-size:12px;color:var(--text);line-height:1.6}
+.td-info-val span{color:var(--gold);font-family:'Space Mono',monospace}
+.td-tip{background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.2);border-radius:6px;padding:12px 14px;font-size:12px;color:var(--text2);line-height:1.8;margin-bottom:14px}
+.td-tip strong{color:var(--gold2)}
 .bt-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
 .bt-section{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px}
 .bt-section-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:14px}
@@ -368,6 +410,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
     <button class="nav-btn" onclick="showTab('backtest',this)">Backtest</button>
     <button class="nav-btn" onclick="showTab('annotator',this)">Annotator</button>
     <button class="nav-btn" onclick="showTab('scanner',this)">Scanner</button>
+    <button class="nav-btn" onclick="showTab('topdown',this)">Top-Down</button>
   </div>
   <div class="header-right">
     <span id="api-dot" class="api-indicator"></span>
@@ -1007,6 +1050,53 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
   </div>
 </div>
 
+<!-- TOP-DOWN GUIDE TAB -->
+<div class="content tab" id="tab-topdown">
+
+  <!-- Pair selector -->
+  <div class="td-pair-tabs" id="td-pair-tabs">
+    <button class="td-pair-btn active" data-pair="XAUUSD" onclick="setTDPair('XAUUSD',this)">XAUUSD</button>
+    <button class="td-pair-btn" data-pair="EURUSD" onclick="setTDPair('EURUSD',this)">EURUSD</button>
+    <button class="td-pair-btn" data-pair="GBPUSD" onclick="setTDPair('GBPUSD',this)">GBPUSD</button>
+    <button class="td-pair-btn" data-pair="AUDUSD" onclick="setTDPair('AUDUSD',this)">AUDUSD</button>
+    <button class="td-pair-btn" data-pair="USDJPY" onclick="setTDPair('USDJPY',this)">USDJPY</button>
+  </div>
+
+  <!-- Pair info bar -->
+  <div class="td-pair-info" id="td-pair-info"></div>
+
+  <!-- Timeframe flow -->
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:14px">
+    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:14px">ICT Top-Down Process — Timeframe by Timeframe</div>
+    <div class="td-flow" id="td-flow"></div>
+  </div>
+
+  <!-- Pre-trade checklist -->
+  <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+    <span>Pre-Trade Checklist</span>
+    <button class="td-reset-btn" onclick="resetTDChecklist()">Reset</button>
+  </div>
+
+  <div class="td-checklist-wrap" id="td-checklist-wrap"></div>
+
+  <!-- Score / verdict -->
+  <div class="td-score-bar-wrap">
+    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:12px">Trade Readiness</div>
+    <div style="height:5px;background:var(--bg4);border-radius:3px;margin-bottom:14px;overflow:hidden">
+      <div id="td-score-fill" style="height:100%;border-radius:3px;transition:width 0.4s;background:var(--gold);width:0%"></div>
+    </div>
+    <div class="td-verdict">
+      <div class="td-score-num td-caution" id="td-score-num">0</div>
+      <div class="td-verdict-msg" id="td-verdict-msg">Work through the checklist above before entering any trade.</div>
+      <button class="btn primary" onclick="sendTDToAnalyzer()" style="white-space:nowrap">Analyze with AI</button>
+    </div>
+  </div>
+
+  <!-- Tip -->
+  <div class="td-tip" id="td-tip"></div>
+
+</div>
+
 <!-- SETTINGS MODAL -->
 <div class="modal-overlay" id="settings-modal">
   <div class="modal">
@@ -1135,6 +1225,7 @@ function showTab(name, el) {
   if (name === 'analyzer') updateApiIndicator();
   if (name === 'scanner') updateApiIndicator();
   if (name === 'news') loadNewsCalendar();
+  if (name === 'topdown') renderTDGuide();
 }
 
 // ─── SESSIONS & CLOCKS ───────────────────────────────────────────────────────
@@ -2602,6 +2693,220 @@ async function getClaudeVerdict(d) {
   } catch(e) {
     document.getElementById('sc-verdict').innerHTML = `<span style="color:var(--red)">Claude error: ${e.message}</span>`;
   }
+}
+
+// ─── TOP-DOWN GUIDE ───────────────────────────────────────────────────────────
+const TD_PAIRS = {
+  XAUUSD: {
+    name: 'Gold', sessions: 'London & NY', bestTF: '15M', minSL: '10-15 pips ($1-1.5)', spread: 'Low',
+    tip: '<strong>Gold (XAUUSD)</strong> moves fast and far. Always check the Daily bias first — gold respects HTF OBs and FVGs more than any other pair. Best entries come from London KZ sweeps of Asian highs/lows. Avoid trading Gold during low-liquidity hours — it whipsaws. Minimum 1:2 R:R, target the next liquidity pool.',
+    tfs: [
+      {tf:'Weekly',role:'Macro Bias',tasks:['Identify premium/discount array','Note major liquidity pools (old highs/lows)','Is price in a HTF OB or FVG?'],key:0},
+      {tf:'Daily',role:'Directional Bias',tasks:['Confirm bullish or bearish bias','Find daily FVG or OB to trade toward','Mark draw on liquidity (target)'],key:1},
+      {tf:'4H',role:'Narrative',tasks:['Confirm MSS or BOS direction','Identify 4H FVG / OB for entry zone','Is price in premium or discount?'],key:1},
+      {tf:'1H',role:'Entry Model',tasks:['Look for CHoCH after liquidity sweep','Mark 1H FVG or mitigation block','Confirm kill zone timing'],key:2},
+      {tf:'15M/5M',role:'Entry Trigger',tasks:['Wait for displacement candle','Entry inside FVG after MSS','SL below OB, TP at next liquidity'],key:2},
+    ]
+  },
+  EURUSD: {
+    name: 'Euro / Dollar', sessions: 'London Open', bestTF: '15M', minSL: '8-12 pips', spread: 'Very Low',
+    tip: '<strong>EURUSD</strong> is the cleanest ICT pair. Highly responsive to London open kill zone (08:00-10:00 UTC). SMT divergence with GBPUSD is very reliable — if GBPUSD makes a new low but EURUSD doesn\'t, look for longs on EURUSD. News events hit hard — always check the calendar before entering.',
+    tfs: [
+      {tf:'Weekly',role:'Macro Bias',tasks:['Premium/discount on weekly range','Old weekly highs/lows as targets','DXY inverse correlation check'],key:0},
+      {tf:'Daily',role:'Directional Bias',tasks:['Daily bias bullish or bearish','Daily OB or FVG to trade toward','Mark equal highs/lows as liquidity'],key:1},
+      {tf:'4H',role:'Narrative',tasks:['4H BOS or CHoCH direction','4H FVG or OB entry zone','Confirm premium/discount'],key:1},
+      {tf:'1H',role:'Entry Model',tasks:['1H liquidity sweep + CHoCH','1H FVG formation','Confirm London KZ timing'],key:2},
+      {tf:'15M/5M',role:'Entry Trigger',tasks:['15M MSS confirmation','Entry on 5M FVG after displacement','SL below structure, TP HTF target'],key:2},
+    ]
+  },
+  GBPUSD: {
+    name: 'Cable', sessions: 'London Open', bestTF: '15M', minSL: '10-15 pips', spread: 'Low',
+    tip: '<strong>GBPUSD</strong> moves more aggressively than EURUSD — wider spreads and bigger ranges. Use SMT divergence with EURUSD. Cable tends to overshoot liquidity levels so give your SL a bit more room. Best during London open — avoid trading it during NY afternoon when it chops.',
+    tfs: [
+      {tf:'Weekly',role:'Macro Bias',tasks:['Weekly premium/discount','Old weekly highs/lows','Compare with EURUSD direction'],key:0},
+      {tf:'Daily',role:'Directional Bias',tasks:['Daily FVG or OB bias','Mark significant liquidity levels','SMT check vs EURUSD'],key:1},
+      {tf:'4H',role:'Narrative',tasks:['4H structure direction','4H entry zone identification','Premium/discount confirmation'],key:1},
+      {tf:'1H',role:'Entry Model',tasks:['1H sweep and CHoCH','1H FVG or OB','London KZ alignment'],key:2},
+      {tf:'15M/5M',role:'Entry Trigger',tasks:['Displacement candle on 15M','5M entry refinement','Wider SL than EURUSD'],key:2},
+    ]
+  },
+  AUDUSD: {
+    name: 'Aussie', sessions: 'Asian & London', bestTF: '15M', minSL: '8-12 pips', spread: 'Low',
+    tip: '<strong>AUDUSD</strong> is commodity-correlated (Gold/Iron Ore). It trends well and respects ICT levels cleanly. Best during Asian session and London open. Tends to range during NY. Watch Gold — if Gold is bullish, AUDUSD often follows. SMT with NZDUSD works well.',
+    tfs: [
+      {tf:'Weekly',role:'Macro Bias',tasks:['Weekly trend direction','Major support/resistance','Gold correlation check'],key:0},
+      {tf:'Daily',role:'Directional Bias',tasks:['Daily bias + FVG/OB','Commodity correlation (Gold)','Mark draw on liquidity'],key:1},
+      {tf:'4H',role:'Narrative',tasks:['4H structure and FVG','Asian session range context','Entry zone on 4H'],key:1},
+      {tf:'1H',role:'Entry Model',tasks:['1H CHoCH after sweep','1H FVG entry zone','Asian or London KZ'],key:2},
+      {tf:'15M/5M',role:'Entry Trigger',tasks:['15M displacement candle','5M entry inside FVG','SL below OB structure'],key:2},
+    ]
+  },
+  USDJPY: {
+    name: 'Dollar / Yen', sessions: 'Asian & NY', bestTF: '15M', minSL: '15-20 pips', spread: 'Low',
+    tip: '<strong>USDJPY — important warning:</strong> This pair moves fast on 1M and 5M. <strong>Never use 1M as your setup timeframe.</strong> Use 15M minimum for entry model, 5M only for trigger refinement. SL must be at least 15 pips to avoid spread hunts. Best during Asian session (22:00-07:00 UTC) and NY open. Watch US10Y yield correlation.',
+    tfs: [
+      {tf:'Weekly',role:'Macro Bias',tasks:['Weekly trend (strong trends)','US10Y yield direction','Major liquidity pools'],key:0},
+      {tf:'Daily',role:'Directional Bias',tasks:['Daily bias + OB/FVG','Yield correlation check','Mark equal highs/lows'],key:1},
+      {tf:'4H',role:'Narrative',tasks:['4H structure direction','4H FVG or mitigation OB','Asian session range 4H'],key:1},
+      {tf:'1H',role:'Entry Model',tasks:['1H sweep of Asian range','1H CHoCH + FVG','Confirm session timing'],key:2},
+      {tf:'15M',role:'Entry Trigger',tasks:['15M displacement ONLY','DO NOT use 1M for entry','Wide SL 15-20 pips minimum'],key:2},
+    ]
+  }
+};
+
+const TD_CHECKLIST = [
+  {
+    section: 'HTF Bias (Daily/Weekly)',
+    items: [
+      {label:'Weekly bias identified', sub:'Bullish or bearish based on weekly candle structure', pts:2},
+      {label:'Daily FVG or OB marked', sub:'Price approaching a key daily level', pts:2},
+      {label:'Draw on liquidity identified', sub:'Where is price going? Old high/low, equal highs/lows', pts:2},
+    ]
+  },
+  {
+    section: 'Market Structure (4H/1H)',
+    items: [
+      {label:'BOS or CHoCH confirmed', sub:'Structure shift in the direction of your trade', pts:2},
+      {label:'Price in discount (longs) or premium (shorts)', sub:'Using 50% Fibonacci of the range', pts:1},
+      {label:'Liquidity swept before entry', sub:'Asian high/low or previous session extreme swept', pts:2},
+    ]
+  },
+  {
+    section: 'Entry Model (15M/5M)',
+    items: [
+      {label:'FVG or OB identified on entry TF', sub:'Clear imbalance or mitigation block at entry zone', pts:2},
+      {label:'OTE retracement (61.8-79%)', sub:'Price retraced into optimal trade entry zone', pts:1},
+      {label:'Displacement candle present', sub:'Strong momentum candle confirming direction', pts:2},
+    ]
+  },
+  {
+    section: 'Session & Timing',
+    items: [
+      {label:'Inside active kill zone', sub:'London Open (08-10 UTC), NY Open (13-15 UTC), Silver Bullet (15-16 UTC)', pts:2},
+      {label:'No high-impact news within 30 mins', sub:'Check News tab — avoid red folder events', pts:2},
+      {label:'SMT divergence confirmed (if applicable)', sub:'Correlated pair confirms direction divergence', pts:1},
+    ]
+  }
+];
+
+let tdChecks = {};
+let tdCurrentPair = 'XAUUSD';
+
+function setTDPair(pair, el) {
+  tdCurrentPair = pair;
+  document.querySelectorAll('.td-pair-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderTDGuide();
+}
+
+function renderTDGuide() {
+  const pairData = TD_PAIRS[tdCurrentPair];
+
+  // Pair info cards
+  const info = document.getElementById('td-pair-info');
+  info.innerHTML = `
+    <div class="td-info-card"><div class="td-info-label">Best Session</div><div class="td-info-val"><span>${pairData.sessions}</span></div></div>
+    <div class="td-info-card"><div class="td-info-label">Entry Timeframe</div><div class="td-info-val"><span>${pairData.bestTF}</span></div></div>
+    <div class="td-info-card"><div class="td-info-label">Min Stop Loss</div><div class="td-info-val"><span>${pairData.minSL}</span></div></div>`;
+
+  // TF flow
+  const flow = document.getElementById('td-flow');
+  flow.innerHTML = '';
+  pairData.tfs.forEach((tf, i) => {
+    if (i < pairData.tfs.length - 1) {
+      flow.innerHTML += `<div class="td-tf-card${tf.key >= 2 ? ' active-tf' : ''}">
+        <div class="td-tf-label">${tf.tf}</div>
+        <div class="td-tf-role">${tf.role}</div>
+        <div class="td-tf-tasks">${tf.tasks.map(t => `<div class="td-tf-task${tf.key >= 1 ? ' key' : ''}">${t}</div>`).join('')}</div>
+      </div>
+      <div class="td-arrow">→</div>`;
+    } else {
+      flow.innerHTML += `<div class="td-tf-card active-tf">
+        <div class="td-tf-label">${tf.tf}</div>
+        <div class="td-tf-role">${tf.role}</div>
+        <div class="td-tf-tasks">${tf.tasks.map(t => `<div class="td-tf-task key">${t}</div>`).join('')}</div>
+      </div>`;
+    }
+  });
+
+  // Checklist
+  const wrap = document.getElementById('td-checklist-wrap');
+  wrap.innerHTML = '';
+  TD_CHECKLIST.forEach((sec, si) => {
+    const secEl = document.createElement('div');
+    secEl.className = 'td-checklist-section';
+    const checked = sec.items.filter(item => tdChecks[sec.section + item.label]).length;
+    secEl.innerHTML = `<div class="td-section-title"><span>${sec.section}</span><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text3)">${checked}/${sec.items.length}</span></div>`;
+    sec.items.forEach(item => {
+      const key = sec.section + item.label;
+      const on = tdChecks[key] || false;
+      const row = document.createElement('div');
+      row.className = 'td-check-row';
+      row.onclick = () => toggleTDCheck(key, row);
+      row.innerHTML = `<div class="td-checkbox${on ? ' on' : ''}" id="tdcb-${key.replace(/\s/g,'_')}">${on ? '✓' : ''}</div>
+        <div><div class="td-check-label" style="color:${on ? 'var(--text2)' : 'var(--text)'}">${item.label} <span style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text3)">+${item.pts}</span></div>
+        <div class="td-check-sub">${item.sub}</div></div>`;
+      secEl.appendChild(row);
+    });
+    wrap.appendChild(secEl);
+  });
+
+  updateTDScore();
+
+  // Tip
+  document.getElementById('td-tip').innerHTML = pairData.tip;
+}
+
+function toggleTDCheck(key, row) {
+  tdChecks[key] = !tdChecks[key];
+  const cb = row.querySelector('.td-checkbox');
+  cb.className = 'td-checkbox' + (tdChecks[key] ? ' on' : '');
+  cb.textContent = tdChecks[key] ? '✓' : '';
+  row.querySelector('.td-check-label').style.color = tdChecks[key] ? 'var(--text2)' : 'var(--text)';
+  updateTDScore();
+}
+
+function updateTDScore() {
+  let score = 0, max = 0;
+  TD_CHECKLIST.forEach(sec => sec.items.forEach(item => {
+    max += item.pts;
+    if (tdChecks[sec.section + item.label]) score += item.pts;
+  }));
+  const pct = max ? Math.round(score / max * 100) : 0;
+  const fill = document.getElementById('td-score-fill');
+  fill.style.width = pct + '%';
+  fill.style.background = pct >= 70 ? 'var(--green)' : pct >= 45 ? 'var(--gold)' : 'var(--red)';
+  const num = document.getElementById('td-score-num');
+  num.textContent = score;
+  num.className = 'td-score-num ' + (pct >= 70 ? 'td-go' : pct >= 45 ? 'td-caution' : 'td-no');
+  const msg = document.getElementById('td-verdict-msg');
+  if (pct >= 70) {
+    msg.innerHTML = `<strong style="color:var(--green)">Ready to trade.</strong> All major confluences aligned. Wait for your entry trigger candle, then execute with discipline. Keep your SL at the marked level — no adjustment after entry.`;
+  } else if (pct >= 45) {
+    msg.innerHTML = `<strong style="color:var(--gold)">Proceed with caution.</strong> Some confluences missing. Consider reducing position size by 50% or waiting for more confirmation before entering.`;
+  } else {
+    msg.innerHTML = `<strong style="color:var(--red)">Do not trade.</strong> Too many confluences missing. The setup is not ready. Protect your capital — there will always be another setup.`;
+  }
+}
+
+function resetTDChecklist() {
+  tdChecks = {};
+  renderTDGuide();
+}
+
+function sendTDToAnalyzer() {
+  const checked = [];
+  TD_CHECKLIST.forEach(sec => sec.items.forEach(item => {
+    if (tdChecks[sec.section + item.label]) checked.push(item.label);
+  }));
+  let score = 0, max = 0;
+  TD_CHECKLIST.forEach(sec => sec.items.forEach(item => {
+    max += item.pts;
+    if (tdChecks[sec.section + item.label]) score += item.pts;
+  }));
+  document.getElementById('ai-pair').value = document.querySelector(`#td-pair-tabs .td-pair-btn.active`)?.dataset.pair || 'XAUUSD';
+  document.getElementById('ai-context').value = `Top-down analysis score: ${score}/${max}\nPair: ${tdCurrentPair}\nConfluences confirmed: ${checked.join(', ') || 'none yet'}`;
+  showTab('analyzer', document.querySelectorAll('.nav-btn')[3]);
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
