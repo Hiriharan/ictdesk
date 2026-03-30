@@ -625,7 +625,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
       <table style="width:100%;border-collapse:collapse;min-width:620px">
         <thead>
           <tr style="background:var(--bg3);border-bottom:1px solid var(--border)">
-            <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left;white-space:nowrap">Date / Time UTC</th>
+            <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left;white-space:nowrap" id="news-tz-header">Date / Time NY</th>
             <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Currency</th>
             <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Event</th>
             <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Impact</th>
@@ -1641,6 +1641,14 @@ async function loadNewsCalendar(forceRefresh = false) {
 function renderNewsTable() {
   const body = document.getElementById('news-body');
   const now = new Date();
+
+  // Update header with current NY timezone
+  const year = now.getUTCFullYear();
+  const dstStart = new Date(Date.UTC(year, 2, 8 + (7 - new Date(Date.UTC(year, 2, 8)).getUTCDay()) % 7, 7));
+  const dstEnd = new Date(Date.UTC(year, 10, 1 + (7 - new Date(Date.UTC(year, 10, 1)).getUTCDay()) % 7, 6));
+  const isEDT = now >= dstStart && now < dstEnd;
+  const hdr = document.getElementById('news-tz-header');
+  if (hdr) hdr.textContent = `Date / Time NY (${isEDT ? 'EDT GMT-4' : 'EST GMT-5'})`;
   const filtered = newsFilter === 'all'
     ? allNewsEvents
     : allNewsEvents.filter(e => e.currency === newsFilter);
@@ -1658,7 +1666,28 @@ function renderNewsTable() {
     const curClass = {USD:'usd',EUR:'eur',GBP:'gbp',JPY:'jpy',AUD:'aud'}[e.currency] || '';
 
     const timeStr = isNaN(eventTime) ? e.date?.slice(0,10) || '—'
-      : `${eventTime.toUTCString().slice(0,11)}<br><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)">${String(eventTime.getUTCHours()).padStart(2,'0')}:${String(eventTime.getUTCMinutes()).padStart(2,'0')} UTC</span>`;
+      : (() => {
+          // Auto-detect NY offset (EST = -5, EDT = -4)
+          const getNYOffset = (d) => {
+            const jan = new Date(d.getFullYear(), 0, 1);
+            const jul = new Date(d.getFullYear(), 6, 1);
+            const stdOffset = Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+            const isDST = d.getTimezoneOffset() < stdOffset;
+            // NY is UTC-5 (EST) or UTC-4 (EDT)
+            // DST starts 2nd Sun March, ends 1st Sun Nov
+            const year = d.getUTCFullYear();
+            const dstStart = new Date(Date.UTC(year, 2, 8 + (7 - new Date(Date.UTC(year, 2, 8)).getUTCDay()) % 7, 7));
+            const dstEnd = new Date(Date.UTC(year, 10, 1 + (7 - new Date(Date.UTC(year, 10, 1)).getUTCDay()) % 7, 6));
+            const nyDST = d >= dstStart && d < dstEnd;
+            return nyDST ? -4 : -5;
+          };
+          const offset = getNYOffset(eventTime);
+          const nyTime = new Date(eventTime.getTime() + (offset * 3600000));
+          const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+          const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          const label = offset === -4 ? 'EDT' : 'EST';
+          return `${days[nyTime.getUTCDay()]} ${nyTime.getUTCDate()} ${months[nyTime.getUTCMonth()]}<br><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)">${String(nyTime.getUTCHours()).padStart(2,'0')}:${String(nyTime.getUTCMinutes()).padStart(2,'0')} ${label}</span>`;
+        })();
 
     let statusHtml = '';
     if (isPast && e.actual !== '') {
