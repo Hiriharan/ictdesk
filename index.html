@@ -319,6 +319,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
 .setup-tag{font-size:10px;padding:2px 7px;border-radius:3px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:'Space Mono',monospace}
 .ai-backtest-panel{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px}
 @media(max-width:700px){.ai-backtest-panel{grid-template-columns:1fr}.bt-stat-grid{grid-template-columns:1fr 1fr}}
+.ff-tab-btn{background:transparent;border:none;color:var(--text2);padding:8px 16px;cursor:pointer;font-family:'Syne',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;border-bottom:2px solid transparent;transition:all 0.15s}
+.ff-tab-btn:hover{color:var(--text)}
+.ff-tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
 .news-row td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;vertical-align:middle}
 .news-row:last-child td{border-bottom:none}
 .news-row:hover td{background:var(--bg3)}
@@ -593,29 +596,48 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
 <!-- NEWS CALENDAR TAB -->
 <div class="content tab" id="tab-news">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3)">High Impact Economic Events</div>
+    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3)">High Impact News — Live</div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <span id="next-event-countdown" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--gold)"></span>
-      <a href="https://www.forexfactory.com/calendar" target="_blank" class="tv-btn" style="font-size:11px;padding:4px 10px">Open Forex Factory</a>
+      <button class="tv-btn" onclick="loadNewsCalendar(true)" style="cursor:pointer;border:none">Refresh</button>
+      <a href="https://www.forexfactory.com/calendar" target="_blank" class="tv-btn">Forex Factory</a>
     </div>
   </div>
-  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;overflow-x:auto">
-    <table style="width:100%;border-collapse:collapse;min-width:600px">
-      <thead>
-        <tr style="background:var(--bg3);border-bottom:1px solid var(--border)">
-          <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Time (UTC)</th>
-          <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Currency</th>
-          <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Event</th>
-          <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Impact</th>
-          <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Status</th>
-        </tr>
-      </thead>
-      <tbody id="news-body"></tbody>
-    </table>
-  </div>
-  <div style="margin-top:12px;font-size:11px;color:var(--text3);line-height:1.7">
-    Showing high-impact events for the current week. Times in UTC. Always avoid entering 2 minutes before and after red folder events.
-    For full calendar with actual/forecast/previous data, open <a href="https://www.forexfactory.com/calendar" target="_blank" style="color:var(--blue)">Forex Factory</a>.
+
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:14px">
+    <div style="display:flex;gap:0;border-bottom:1px solid var(--border);background:var(--bg3);padding:0 4px;flex-wrap:wrap;align-items:center;justify-content:space-between">
+      <div style="display:flex">
+        <button class="ff-tab-btn active" data-filter="all" onclick="filterNews('all',this)">All</button>
+        <button class="ff-tab-btn" data-filter="USD" onclick="filterNews('USD',this)">USD</button>
+        <button class="ff-tab-btn" data-filter="EUR" onclick="filterNews('EUR',this)">EUR</button>
+        <button class="ff-tab-btn" data-filter="GBP" onclick="filterNews('GBP',this)">GBP</button>
+        <button class="ff-tab-btn" data-filter="JPY" onclick="filterNews('JPY',this)">JPY</button>
+        <button class="ff-tab-btn" data-filter="AUD" onclick="filterNews('AUD',this)">AUD</button>
+      </div>
+      <span id="news-last-updated" style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;padding-right:12px"></span>
+    </div>
+
+    <div id="news-loading" style="padding:32px;text-align:center;color:var(--text3);font-family:'Space Mono',monospace;font-size:12px;display:none">
+      <span class="ai-thinking">Loading live events</span>
+    </div>
+
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;min-width:620px">
+        <thead>
+          <tr style="background:var(--bg3);border-bottom:1px solid var(--border)">
+            <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left;white-space:nowrap">Date / Time UTC</th>
+            <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Currency</th>
+            <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Event</th>
+            <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Impact</th>
+            <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:right">Actual</th>
+            <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:right">Forecast</th>
+            <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:right">Previous</th>
+            <th style="padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left">Status</th>
+          </tr>
+        </thead>
+        <tbody id="news-body"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -1112,6 +1134,7 @@ function showTab(name, el) {
   if (name === 'chart') setTimeout(loadTVChart, 100);
   if (name === 'analyzer') updateApiIndicator();
   if (name === 'scanner') updateApiIndicator();
+  if (name === 'news') loadNewsCalendar();
 }
 
 // ─── SESSIONS & CLOCKS ───────────────────────────────────────────────────────
@@ -1572,7 +1595,145 @@ function copyPine() {
 }
 
 
-// ─── NEWS CALENDAR ────────────────────────────────────────────────────────────
+// ─── LIVE NEWS CALENDAR ───────────────────────────────────────────────────────
+let allNewsEvents = [];
+let newsFilter = 'all';
+
+async function loadNewsCalendar(forceRefresh = false) {
+  const body = document.getElementById('news-body');
+  const loading = document.getElementById('news-loading');
+  if (!body) return;
+
+  loading.style.display = 'block';
+  body.innerHTML = '';
+
+  try {
+    // Use TradingEconomics calendar via allorigins CORS proxy — free, no key
+    const today = new Date();
+    const monday = new Date(today);
+    monday.setUTCDate(today.getUTCDate() - ((today.getUTCDay() + 6) % 7));
+    const sunday = new Date(monday);
+    sunday.setUTCDate(monday.getUTCDate() + 6);
+    const fmt = d => d.toISOString().split('T')[0];
+
+    // Fetch from Trading Economics free calendar JSON
+    const url = `https://api.allorigins.win/get?url=${encodeURIComponent(`https://tradingeconomics.com/calendar/json?c=guest:guest&d1=${fmt(monday)}&d2=${fmt(sunday)}&importance=3`)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const events = JSON.parse(data.contents);
+
+    allNewsEvents = events.map(e => ({
+      date: e.Date || e.date || '',
+      currency: e.Currency || e.currency || '',
+      event: e.Event || e.event || e.Indicator || '',
+      impact: 3,
+      actual: e.Actual ?? e.actual ?? '',
+      forecast: e.Forecast ?? e.forecast ?? e.TEForecast ?? '',
+      previous: e.Previous ?? e.previous ?? '',
+    })).filter(e => e.currency && e.event);
+
+    renderNewsTable();
+    document.getElementById('news-last-updated').textContent = 'Updated ' + new Date().toUTCString().slice(17,22) + ' UTC';
+
+  } catch(e) {
+    // Fallback to built-in recurring schedule if API fails
+    allNewsEvents = getWeeklyNews().map(ev => ({
+      date: ev.time.toISOString(),
+      currency: ev.cur,
+      event: ev.name,
+      impact: 3,
+      actual: '',
+      forecast: '',
+      previous: '',
+      _static: true
+    }));
+    renderNewsTable();
+    document.getElementById('news-last-updated').textContent = 'Live fetch failed — showing recurring schedule';
+  }
+
+  loading.style.display = 'none';
+  updateNewsCountdown();
+}
+
+function renderNewsTable() {
+  const body = document.getElementById('news-body');
+  const now = new Date();
+  const filtered = newsFilter === 'all'
+    ? allNewsEvents
+    : allNewsEvents.filter(e => e.currency === newsFilter);
+
+  if (!filtered.length) {
+    body.innerHTML = `<tr><td colspan="8" style="padding:24px;text-align:center;color:var(--text3);font-size:13px">No events found${newsFilter !== 'all' ? ' for ' + newsFilter : ''}.</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = filtered.map(e => {
+    const eventTime = new Date(e.date);
+    const isPast = eventTime < now;
+    const diffMs = eventTime - now;
+    const isImminent = !isPast && diffMs < 7200000;
+    const curClass = {USD:'usd',EUR:'eur',GBP:'gbp',JPY:'jpy',AUD:'aud'}[e.currency] || '';
+
+    const timeStr = isNaN(eventTime) ? e.date?.slice(0,10) || '—'
+      : `${eventTime.toUTCString().slice(0,11)}<br><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)">${String(eventTime.getUTCHours()).padStart(2,'0')}:${String(eventTime.getUTCMinutes()).padStart(2,'0')} UTC</span>`;
+
+    let statusHtml = '';
+    if (isPast && e.actual !== '') {
+      statusHtml = `<span style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace">Released</span>`;
+    } else if (isPast) {
+      statusHtml = `<span style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace">Done</span>`;
+    } else if (isImminent) {
+      const mins = Math.floor(diffMs / 60000);
+      statusHtml = `<span class="news-live">${mins < 1 ? 'NOW' : mins + 'm'}</span>`;
+    } else {
+      const h = Math.floor(diffMs / 3600000);
+      const m = Math.floor((diffMs % 3600000) / 60000);
+      statusHtml = `<span style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace">in ${h > 0 ? h + 'h ' : ''}${m}m</span>`;
+    }
+
+    const actualColor = e.actual !== '' && e.forecast !== ''
+      ? (parseFloat(e.actual) > parseFloat(e.forecast) ? 'var(--green)' : parseFloat(e.actual) < parseFloat(e.forecast) ? 'var(--red)' : 'var(--text)')
+      : 'var(--text)';
+
+    return `<tr class="news-row${isPast ? ' past' : isImminent ? ' upcoming' : ''}" style="opacity:${isPast?'0.5':'1'}">
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap">${timeStr}</td>
+      <td><span class="news-currency ${curClass}">${e.currency}</span></td>
+      <td style="color:var(--text);font-size:13px;max-width:240px">${e.event}</td>
+      <td><span class="impact-high"></span><span style="font-size:10px;color:var(--red)">HIGH</span></td>
+      <td style="text-align:right;font-family:'Space Mono',monospace;font-size:12px;color:${actualColor}">${e.actual !== '' ? e.actual : '—'}</td>
+      <td style="text-align:right;font-family:'Space Mono',monospace;font-size:12px;color:var(--text2)">${e.forecast !== '' ? e.forecast : '—'}</td>
+      <td style="text-align:right;font-family:'Space Mono',monospace;font-size:12px;color:var(--text3)">${e.previous !== '' ? e.previous : '—'}</td>
+      <td>${statusHtml}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterNews(cur, el) {
+  newsFilter = cur;
+  document.querySelectorAll('.ff-tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderNewsTable();
+}
+
+function updateNewsCountdown() {
+  const now = new Date();
+  const cdEl = document.getElementById('next-event-countdown');
+  if (!cdEl || !allNewsEvents.length) return;
+  const next = allNewsEvents
+    .map(e => ({...e, t: new Date(e.date)}))
+    .filter(e => e.t > now)
+    .sort((a, b) => a.t - b.t)[0];
+  if (next) {
+    const diff = next.t - now;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    cdEl.textContent = `Next: ${next.event} (${next.currency}) in ${h > 0 ? h + 'h ' : ''}${m}m`;
+  } else {
+    cdEl.textContent = 'No more events this week';
+  }
+}
+
+// ─── NEWS CALENDAR (recurring fallback) ───────────────────────────────────────
 function getWeeklyNews() {
   const now = new Date();
   const day = now.getUTCDay();
@@ -2437,7 +2598,6 @@ buildChecklist();
 renderJournal();
 renderBacktest();
 buildKillZones();
-buildNewsCalendar();
 updateClocks();
 checkWeekend();
 updateApiIndicator();
@@ -2445,7 +2605,7 @@ setTimeout(generatePine, 500);
 setInterval(updateClocks, 1000);
 setInterval(buildKillZones, 60000);
 setInterval(checkWeekend, 60000);
-setInterval(buildNewsCalendar, 60000);
+setInterval(updateNewsCountdown, 60000);
 </script>
 </body>
 </html>
