@@ -1230,7 +1230,12 @@ async function handleAuth() {
 
   err.style.color = 'var(--red)';
 
-  if (!supabase) { err.textContent = 'App still loading — please wait a moment and try again'; return; }
+  if (!supabase) {
+    err.textContent = 'Still connecting to server — please wait 5 seconds and try again';
+    // Try reinitialising
+    setTimeout(initSupabase, 1000);
+    return;
+  }
   if (!email || !password) { err.textContent = 'Please enter email and password'; return; }
   if (!email.includes('@')) { err.textContent = 'Please enter a valid email address'; return; }
 
@@ -1246,29 +1251,42 @@ async function handleAuth() {
 
   try {
     if (authTab === 'signup') {
-      const { data, error } = await supabase.auth.signUp({
-        email, password,
-        options: { emailRedirectTo: window.location.origin }
-      });
-      if (error) throw error;
-      // If email confirmation disabled, user is logged in immediately
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        // Show the exact Supabase error
+        err.style.color = 'var(--red)';
+        err.textContent = 'Signup error: ' + error.message + ' (code: ' + (error.status || 'unknown') + ')';
+        loading.style.display = 'none';
+        btn.disabled = false;
+        return;
+      }
       if (data.session) {
         currentUser = data.session.user;
         unlockApp(currentUser);
-      } else {
+      } else if (data.user) {
+        // Account created but needs email confirmation
         err.style.color = 'var(--green)';
-        err.textContent = 'Account created! Check your email to confirm your account, then sign in.';
+        err.textContent = 'Account created! Check your email inbox to confirm, then sign in here.';
         setAuthTab('signin');
+      } else {
+        err.textContent = 'Unexpected response — try signing in instead';
       }
     } else {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      if (error) {
+        err.style.color = 'var(--red)';
+        err.textContent = 'Sign in error: ' + error.message;
+        loading.style.display = 'none';
+        btn.disabled = false;
+        return;
+      }
       currentUser = data.session.user;
       unlockApp(currentUser);
     }
   } catch(e) {
     err.style.color = 'var(--red)';
-    err.textContent = e.message || 'Authentication failed';
+    err.textContent = 'Connection error: ' + (e.message || 'Unknown error — check your internet connection');
+    console.error('Auth error:', e);
   }
 
   loading.style.display = 'none';
