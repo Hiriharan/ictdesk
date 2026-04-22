@@ -1172,7 +1172,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
 const SUPABASE_URL = 'https://rqtryeukepkwxalawfej.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxdHJ5ZXVrZXBrd3hhbGF3ZmVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTQ2OTksImV4cCI6MjA5MjQzMDY5OX0.2aB6quISfMDcrRJnHgdH8u9KN0tyCeWFtrs9MAyXP5A';
 
-let supabase = null;
+let supabaseClient = null;
 let currentUser = null;
 let authTab = 'signin';
 
@@ -1180,10 +1180,9 @@ async function initSupabase() {
   try {
     const { createClient } = window.supabase;
     if (!createClient) throw new Error('Supabase SDK not loaded');
-    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Check existing session
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
     if (session) {
       currentUser = session.user;
       unlockApp(currentUser);
@@ -1191,8 +1190,7 @@ async function initSupabase() {
       setTimeout(() => document.getElementById('auth-email')?.focus(), 100);
     }
 
-    // Listen for auth state changes
-    supabase.auth.onAuthStateChange((event, session) => {
+    supabaseClient.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
         currentUser = session.user;
         unlockApp(currentUser);
@@ -1204,7 +1202,7 @@ async function initSupabase() {
   } catch(e) {
     console.error('Supabase init error:', e);
     const err = document.getElementById('gate-err');
-    if (err) { err.style.color = 'var(--red)'; err.textContent = 'Connection error — refresh the page and try again'; }
+    if (err) { err.style.color = 'var(--red)'; err.textContent = 'Connection error: ' + e.message; }
   }
 }
 
@@ -1230,7 +1228,7 @@ async function handleAuth() {
 
   err.style.color = 'var(--red)';
 
-  if (!supabase) {
+  if (!supabaseClient) {
     err.textContent = 'Still connecting to server — please wait 5 seconds and try again';
     // Try reinitialising
     setTimeout(initSupabase, 1000);
@@ -1251,7 +1249,7 @@ async function handleAuth() {
 
   try {
     if (authTab === 'signup') {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabaseClient.auth.signUp({ email, password });
       if (error) {
         // Show the exact Supabase error
         err.style.color = 'var(--red)';
@@ -1272,7 +1270,7 @@ async function handleAuth() {
         err.textContent = 'Unexpected response — try signing in instead';
       }
     } else {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) {
         err.style.color = 'var(--red)';
         err.textContent = 'Sign in error: ' + error.message;
@@ -1295,7 +1293,7 @@ async function handleAuth() {
 
 async function signInWithGoogle() {
   try {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabaseClient.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: window.location.origin }
     });
@@ -1306,7 +1304,7 @@ async function signInWithGoogle() {
 }
 
 async function signOut() {
-  await supabase.auth.signOut();
+  await supabaseClient.auth.signOut();
   showToast('Signed out');
 }
 
@@ -1322,7 +1320,7 @@ function unlockApp(user) {
 
 // ─── SUPABASE DATA SYNC ───────────────────────────────────────────────────────
 async function loadCloudData() {
-  if (!supabase || !currentUser) return;
+  if (!supabaseClient || !currentUser) return;
   try {
     // Load trades
     const { data: cloudTrades } = await supabase
@@ -1372,9 +1370,9 @@ async function loadCloudData() {
 }
 
 async function saveTradeCloud(trade) {
-  if (!supabase || !currentUser) return;
+  if (!supabaseClient || !currentUser) return;
   try {
-    await supabase.from('trades').insert({
+    await supabaseClient.from('trades').insert({
       user_id: currentUser.id,
       date: trade.date, pair: trade.pair, dir: trade.dir,
       sess: trade.sess, rr: trade.rr, result: trade.result,
@@ -1384,15 +1382,15 @@ async function saveTradeCloud(trade) {
 }
 
 async function deleteTradeCloud(id) {
-  if (!supabase || !currentUser) return;
-  try { await supabase.from('trades').delete().eq('id', id).eq('user_id', currentUser.id); }
+  if (!supabaseClient || !currentUser) return;
+  try { await supabaseClient.from('trades').delete().eq('id', id).eq('user_id', currentUser.id); }
   catch(e) { console.error('Delete trade error:', e); }
 }
 
 async function saveAnnotationCloud(entry) {
-  if (!supabase || !currentUser) return;
+  if (!supabaseClient || !currentUser) return;
   try {
-    const { data } = await supabase.from('annotations').insert({
+    const { data } = await supabaseClient.from('annotations').insert({
       user_id: currentUser.id,
       pair: entry.pair, tf: entry.tf, style: entry.style,
       grade: entry.grade, direction: entry.direction,
@@ -1410,21 +1408,21 @@ async function saveAnnotationCloud(entry) {
 }
 
 async function updateAnnotationOutcomeCloud(id, outcome) {
-  if (!supabase || !currentUser) return;
-  try { await supabase.from('annotations').update({ outcome }).eq('id', id).eq('user_id', currentUser.id); }
+  if (!supabaseClient || !currentUser) return;
+  try { await supabaseClient.from('annotations').update({ outcome }).eq('id', id).eq('user_id', currentUser.id); }
   catch(e) { console.error('Update annotation error:', e); }
 }
 
 async function deleteAnnotationCloud(id) {
-  if (!supabase || !currentUser) return;
-  try { await supabase.from('annotations').delete().eq('id', id).eq('user_id', currentUser.id); }
+  if (!supabaseClient || !currentUser) return;
+  try { await supabaseClient.from('annotations').delete().eq('id', id).eq('user_id', currentUser.id); }
   catch(e) { console.error('Delete annotation error:', e); }
 }
 
 async function saveChecklistCloud() {
-  if (!supabase || !currentUser) return;
+  if (!supabaseClient || !currentUser) return;
   try {
-    await supabase.from('checklist_state').upsert({
+    await supabaseClient.from('checklist_state').upsert({
       user_id: currentUser.id,
       state: checkState,
       updated_at: new Date().toISOString()
