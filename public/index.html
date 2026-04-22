@@ -1178,28 +1178,35 @@ let currentUser = null;
 let authTab = 'signin';
 
 async function initSupabase() {
-  const { createClient } = window.supabase;
-  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  try {
+    const { createClient } = window.supabase;
+    if (!createClient) throw new Error('Supabase SDK not loaded');
+    supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  // Check existing session
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    currentUser = session.user;
-    unlockApp(currentUser);
-  } else {
-    setTimeout(() => document.getElementById('auth-email')?.focus(), 100);
-  }
-
-  // Listen for auth state changes
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN' && session) {
+    // Check existing session
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
       currentUser = session.user;
       unlockApp(currentUser);
-    } else if (event === 'SIGNED_OUT') {
-      currentUser = null;
-      showGate();
+    } else {
+      setTimeout(() => document.getElementById('auth-email')?.focus(), 100);
     }
-  });
+
+    // Listen for auth state changes
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        currentUser = session.user;
+        unlockApp(currentUser);
+      } else if (event === 'SIGNED_OUT') {
+        currentUser = null;
+        showGate();
+      }
+    });
+  } catch(e) {
+    console.error('Supabase init error:', e);
+    const err = document.getElementById('gate-err');
+    if (err) { err.style.color = 'var(--red)'; err.textContent = 'Connection error — refresh the page and try again'; }
+  }
 }
 
 function setAuthTab(tab) {
@@ -1222,7 +1229,11 @@ async function handleAuth() {
   const loading = document.getElementById('gate-loading');
   const btn = document.getElementById('auth-btn');
 
+  err.style.color = 'var(--red)';
+
+  if (!supabase) { err.textContent = 'App still loading — please wait a moment and try again'; return; }
   if (!email || !password) { err.textContent = 'Please enter email and password'; return; }
+  if (!email.includes('@')) { err.textContent = 'Please enter a valid email address'; return; }
 
   if (authTab === 'signup') {
     const confirm = document.getElementById('auth-confirm').value;
@@ -1236,14 +1247,25 @@ async function handleAuth() {
 
   try {
     if (authTab === 'signup') {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({
+        email, password,
+        options: { emailRedirectTo: window.location.origin }
+      });
       if (error) throw error;
-      err.style.color = 'var(--green)';
-      err.textContent = 'Account created! Check your email to confirm, then sign in.';
-      setAuthTab('signin');
+      // If email confirmation disabled, user is logged in immediately
+      if (data.session) {
+        currentUser = data.session.user;
+        unlockApp(currentUser);
+      } else {
+        err.style.color = 'var(--green)';
+        err.textContent = 'Account created! Check your email to confirm your account, then sign in.';
+        setAuthTab('signin');
+      }
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      currentUser = data.session.user;
+      unlockApp(currentUser);
     }
   } catch(e) {
     err.style.color = 'var(--red)';
