@@ -380,16 +380,42 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
 .news-time{font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)}
 .news-live{font-size:10px;padding:2px 7px;border-radius:3px;background:rgba(224,85,85,0.15);color:var(--red);font-family:'Space Mono',monospace;border:1px solid rgba(224,85,85,0.3)}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
-<!-- PASSWORD GATE -->
+<!-- AUTH GATE -->
 <div class="gate" id="gate">
-  <div class="gate-box">
+  <div class="gate-box" style="max-width:400px">
     <div class="gate-logo">ICT Desk</div>
-    <div class="gate-sub">Private trading suite — enter password to continue</div>
-    <input class="gate-input" type="password" id="gate-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkGate()">
-    <button class="gate-btn" onclick="checkGate()">Unlock</button>
-    <div class="gate-err" id="gate-err"></div>
+    <div class="gate-sub" id="gate-sub">Sign in to your trading suite</div>
+
+    <!-- Auth tabs -->
+    <div style="display:flex;gap:0;margin-bottom:20px;border:1px solid var(--border2);border-radius:4px;overflow:hidden">
+      <button id="tab-signin-btn" onclick="setAuthTab('signin')" style="flex:1;padding:8px;background:var(--gold3);border:none;color:var(--gold2);font-family:'Syne',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer">Sign In</button>
+      <button id="tab-signup-btn" onclick="setAuthTab('signup')" style="flex:1;padding:8px;background:var(--bg3);border:none;color:var(--text2);font-family:'Syne',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer">Create Account</button>
+    </div>
+
+    <input class="gate-input" type="email" id="auth-email" placeholder="Email address" style="letter-spacing:0;text-align:left;margin-bottom:10px">
+    <input class="gate-input" type="password" id="auth-password" placeholder="Password" onkeydown="if(event.key==='Enter')handleAuth()" style="letter-spacing:2px">
+    <div id="auth-confirm-wrap" style="display:none;margin-top:10px">
+      <input class="gate-input" type="password" id="auth-confirm" placeholder="Confirm password" style="letter-spacing:2px">
+    </div>
+
+    <button class="gate-btn" id="auth-btn" onclick="handleAuth()" style="margin-top:14px">Sign In</button>
+
+    <!-- Google OAuth -->
+    <div style="display:flex;align-items:center;gap:10px;margin:14px 0">
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+      <span style="font-size:11px;color:var(--text3)">or</span>
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+    </div>
+    <button onclick="signInWithGoogle()" style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text);font-family:'Syne',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)'">
+      <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="gate-err" id="gate-err" style="margin-top:10px"></div>
+    <div id="gate-loading" style="display:none;text-align:center;font-size:12px;color:var(--text3);margin-top:10px;font-family:'Space Mono',monospace">Authenticating...</div>
   </div>
 </div>
 
@@ -403,20 +429,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
     <button class="nav-btn" onclick="showTab('checklist',this)">Confluence</button>
     <button class="nav-btn" onclick="showTab('journal',this)">Journal</button>
     <button class="nav-btn" onclick="showTab('analyzer',this)">AI Analyzer</button>
-    <button class="nav-btn" onclick="showTab('chart',this)">Live Chart</button>
-    <button class="nav-btn" onclick="showTab('pine',this)">Pine Script</button>
     <button class="nav-btn" onclick="showTab('news',this)">News</button>
-    <button class="nav-btn" onclick="showTab('risk',this)">Risk Calc</button>
-    <button class="nav-btn" onclick="showTab('backtest',this)">Backtest</button>
     <button class="nav-btn" onclick="showTab('annotator',this)">Annotator</button>
     <button class="nav-btn" onclick="showTab('annlog',this)">Ann. Log</button>
     <button class="nav-btn" onclick="showTab('scanner',this)">Scanner</button>
-    <button class="nav-btn" onclick="showTab('topdown',this)">Top-Down</button>
   </div>
   <div class="header-right">
     <span id="api-dot" class="api-indicator"></span>
-    <span id="session-timer" style="font-size:10px;color:var(--text3);font-family:'Space Mono',monospace;margin-right:4px"></span>
-    <button class="settings-btn" onclick="lockApp()" style="border-color:rgba(224,85,85,0.3);color:var(--red)" title="Lock app">Lock</button>
+    <span id="user-display" style="font-size:11px;color:var(--text3);font-family:'Space Mono',monospace;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+    <button class="settings-btn" onclick="signOut()" style="border-color:rgba(224,85,85,0.3);color:var(--red)">Sign Out</button>
     <button class="settings-btn" onclick="openSettings()">Settings</button>
   </div>
 </div>
@@ -1147,77 +1168,237 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
 </div><!-- end main-app -->
 
 <script>
-// ─── PASSWORD GATE ────────────────────────────────────────────────────────────
-const GATE_PASSWORD = '0000';
-const GATE_SESSION_KEY = 'ict_auth';
-const GATE_EXPIRY_KEY = 'ict_auth_expiry';
-const GATE_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
-let activityTimer = null;
+// ─── SUPABASE AUTH ────────────────────────────────────────────────────────────
+// IMPORTANT: Replace these with your actual Supabase project values
+const SUPABASE_URL = 'https://rqtryeukepkwxalawfej.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxdHJ5ZXVrZXBrd3hhbGF3ZmVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTQ2OTksImV4cCI6MjA5MjQzMDY5OX0.2aB6quISfMDcrRJnHgdH8u9KN0tyCeWFtrs9MAyXP5A';
 
-function checkGate() {
-  const val = document.getElementById('gate-input').value;
-  const err = document.getElementById('gate-err');
-  if (val === GATE_PASSWORD) {
-    unlockApp();
-    err.textContent = '';
+let supabase = null;
+let currentUser = null;
+let authTab = 'signin';
+
+async function initSupabase() {
+  const { createClient } = window.supabase;
+  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Check existing session
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    unlockApp(currentUser);
   } else {
-    err.textContent = 'Incorrect password';
-    document.getElementById('gate-input').value = '';
-    document.getElementById('gate-input').focus();
+    setTimeout(() => document.getElementById('auth-email')?.focus(), 100);
+  }
+
+  // Listen for auth state changes
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      currentUser = session.user;
+      unlockApp(currentUser);
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null;
+      showGate();
+    }
+  });
+}
+
+function setAuthTab(tab) {
+  authTab = tab;
+  const isSignup = tab === 'signup';
+  document.getElementById('tab-signin-btn').style.background = isSignup ? 'var(--bg3)' : 'var(--gold3)';
+  document.getElementById('tab-signin-btn').style.color = isSignup ? 'var(--text2)' : 'var(--gold2)';
+  document.getElementById('tab-signup-btn').style.background = isSignup ? 'var(--gold3)' : 'var(--bg3)';
+  document.getElementById('tab-signup-btn').style.color = isSignup ? 'var(--gold2)' : 'var(--text2)';
+  document.getElementById('auth-btn').textContent = isSignup ? 'Create Account' : 'Sign In';
+  document.getElementById('gate-sub').textContent = isSignup ? 'Create your ICT Desk account' : 'Sign in to your trading suite';
+  document.getElementById('auth-confirm-wrap').style.display = isSignup ? 'block' : 'none';
+  document.getElementById('gate-err').textContent = '';
+}
+
+async function handleAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const err = document.getElementById('gate-err');
+  const loading = document.getElementById('gate-loading');
+  const btn = document.getElementById('auth-btn');
+
+  if (!email || !password) { err.textContent = 'Please enter email and password'; return; }
+
+  if (authTab === 'signup') {
+    const confirm = document.getElementById('auth-confirm').value;
+    if (password !== confirm) { err.textContent = 'Passwords do not match'; return; }
+    if (password.length < 6) { err.textContent = 'Password must be at least 6 characters'; return; }
+  }
+
+  err.textContent = '';
+  loading.style.display = 'block';
+  btn.disabled = true;
+
+  try {
+    if (authTab === 'signup') {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) throw error;
+      err.style.color = 'var(--green)';
+      err.textContent = 'Account created! Check your email to confirm, then sign in.';
+      setAuthTab('signin');
+    } else {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+    }
+  } catch(e) {
+    err.style.color = 'var(--red)';
+    err.textContent = e.message || 'Authentication failed';
+  }
+
+  loading.style.display = 'none';
+  btn.disabled = false;
+}
+
+async function signInWithGoogle() {
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.origin }
+    });
+    if (error) throw error;
+  } catch(e) {
+    document.getElementById('gate-err').textContent = e.message;
   }
 }
 
-function unlockApp() {
-  const expiry = Date.now() + GATE_TIMEOUT_MS;
-  sessionStorage.setItem(GATE_SESSION_KEY, '1');
-  sessionStorage.setItem(GATE_EXPIRY_KEY, expiry.toString());
+async function signOut() {
+  await supabase.auth.signOut();
+  showToast('Signed out');
+}
+
+function unlockApp(user) {
   document.getElementById('gate').style.display = 'none';
   document.getElementById('main-app').style.display = 'flex';
   document.getElementById('main-app').style.flexDirection = 'column';
-  startActivityTimer();
+  const display = document.getElementById('user-display');
+  if (display) display.textContent = user.email?.split('@')[0] || 'Trader';
+  // Load cloud data after login
+  loadCloudData();
 }
 
-function lockApp() {
-  sessionStorage.removeItem(GATE_SESSION_KEY);
-  sessionStorage.removeItem(GATE_EXPIRY_KEY);
-  clearTimeout(activityTimer);
+// ─── SUPABASE DATA SYNC ───────────────────────────────────────────────────────
+async function loadCloudData() {
+  if (!supabase || !currentUser) return;
+  try {
+    // Load trades
+    const { data: cloudTrades } = await supabase
+      .from('trades').select('*')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false });
+    if (cloudTrades && cloudTrades.length) {
+      trades = cloudTrades.map(t => ({
+        id: t.id, date: t.date, pair: t.pair, dir: t.dir,
+        sess: t.sess, rr: t.rr, result: t.result, r: t.r, notes: t.notes
+      }));
+      renderJournal();
+    }
+
+    // Load annotations
+    const { data: cloudAnns } = await supabase
+      .from('annotations').select('*')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: false });
+    if (cloudAnns && cloudAnns.length) {
+      annLog = cloudAnns.map(a => ({
+        id: a.id, timestamp: a.created_at,
+        pair: a.pair, tf: a.tf, style: a.style,
+        grade: a.grade, direction: a.direction,
+        entry_price: a.entry_price, sl_price: a.sl_price,
+        tp1_price: a.tp1_price, tp2_price: a.tp2_price,
+        rr: a.rr, entry_trigger: a.entry_trigger,
+        analysis: a.analysis, invalidation: a.invalidation,
+        confluences: a.confluences || [],
+        sniper_checklist: a.sniper_checklist || [],
+        chart_thumb: a.chart_thumb, outcome: a.outcome || 'pending'
+      }));
+    }
+
+    // Load checklist state
+    const { data: clData } = await supabase
+      .from('checklist_state').select('*')
+      .eq('user_id', currentUser.id)
+      .single();
+    if (clData?.state) {
+      checkState = clData.state;
+      buildChecklist();
+    }
+
+    showToast('Data loaded from cloud', 'success');
+  } catch(e) { console.error('Cloud load error:', e); }
+}
+
+async function saveTradeCloud(trade) {
+  if (!supabase || !currentUser) return;
+  try {
+    await supabase.from('trades').insert({
+      user_id: currentUser.id,
+      date: trade.date, pair: trade.pair, dir: trade.dir,
+      sess: trade.sess, rr: trade.rr, result: trade.result,
+      r: trade.r, notes: trade.notes
+    });
+  } catch(e) { console.error('Save trade error:', e); }
+}
+
+async function deleteTradeCloud(id) {
+  if (!supabase || !currentUser) return;
+  try { await supabase.from('trades').delete().eq('id', id).eq('user_id', currentUser.id); }
+  catch(e) { console.error('Delete trade error:', e); }
+}
+
+async function saveAnnotationCloud(entry) {
+  if (!supabase || !currentUser) return;
+  try {
+    const { data } = await supabase.from('annotations').insert({
+      user_id: currentUser.id,
+      pair: entry.pair, tf: entry.tf, style: entry.style,
+      grade: entry.grade, direction: entry.direction,
+      entry_price: entry.entry_price, sl_price: entry.sl_price,
+      tp1_price: entry.tp1_price, tp2_price: entry.tp2_price,
+      rr: entry.rr, entry_trigger: entry.entry_trigger,
+      analysis: entry.analysis, invalidation: entry.invalidation,
+      confluences: entry.confluences,
+      sniper_checklist: entry.sniper_checklist,
+      chart_thumb: entry.chart_thumb,
+      outcome: entry.outcome
+    }).select().single();
+    return data?.id;
+  } catch(e) { console.error('Save annotation error:', e); }
+}
+
+async function updateAnnotationOutcomeCloud(id, outcome) {
+  if (!supabase || !currentUser) return;
+  try { await supabase.from('annotations').update({ outcome }).eq('id', id).eq('user_id', currentUser.id); }
+  catch(e) { console.error('Update annotation error:', e); }
+}
+
+async function deleteAnnotationCloud(id) {
+  if (!supabase || !currentUser) return;
+  try { await supabase.from('annotations').delete().eq('id', id).eq('user_id', currentUser.id); }
+  catch(e) { console.error('Delete annotation error:', e); }
+}
+
+async function saveChecklistCloud() {
+  if (!supabase || !currentUser) return;
+  try {
+    await supabase.from('checklist_state').upsert({
+      user_id: currentUser.id,
+      state: checkState,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id' });
+  } catch(e) { console.error('Save checklist error:', e); }
+}
+
+function showGate() {
   document.getElementById('gate').style.display = 'flex';
   document.getElementById('main-app').style.display = 'none';
-  document.getElementById('gate-input').value = '';
-  document.getElementById('gate-err').textContent = 'Session expired — please re-enter password';
-  setTimeout(() => document.getElementById('gate-input').focus(), 100);
+  setTimeout(() => document.getElementById('auth-email')?.focus(), 100);
 }
 
-function resetActivityTimer() {
-  clearTimeout(activityTimer);
-  const expiry = Date.now() + GATE_TIMEOUT_MS;
-  sessionStorage.setItem(GATE_EXPIRY_KEY, expiry.toString());
-  activityTimer = setTimeout(lockApp, GATE_TIMEOUT_MS);
-}
-
-function startActivityTimer() {
-  clearTimeout(activityTimer);
-  activityTimer = setTimeout(lockApp, GATE_TIMEOUT_MS);
-  // Reset on any user interaction
-  ['mousemove','mousedown','keydown','touchstart','scroll','click'].forEach(evt =>
-    document.addEventListener(evt, resetActivityTimer, {passive: true})
-  );
-}
-
-(function() {
-  const auth = sessionStorage.getItem(GATE_SESSION_KEY);
-  const expiry = parseInt(sessionStorage.getItem(GATE_EXPIRY_KEY) || '0');
-  if (auth === '1' && Date.now() < expiry) {
-    document.getElementById('gate').style.display = 'none';
-    document.getElementById('main-app').style.display = 'flex';
-    document.getElementById('main-app').style.flexDirection = 'column';
-    startActivityTimer();
-  } else {
-    sessionStorage.removeItem(GATE_SESSION_KEY);
-    sessionStorage.removeItem(GATE_EXPIRY_KEY);
-    setTimeout(() => document.getElementById('gate-input').focus(), 100);
-  }
-})();
 // ─── STATE ───────────────────────────────────────────────────────────────────
 const DEFAULT_PAIRS = ['XAUUSD','AUDUSD','USDJPY','EURUSD','GBPUSD'];
 let pairs = JSON.parse(localStorage.getItem('ict_pairs') || JSON.stringify(DEFAULT_PAIRS));
@@ -1347,7 +1528,15 @@ function checkWeekend() {
 function updateClocks() {
   const now = new Date();
   const fmt = (h, m) => `${pad(h)}:${pad(m)}`;
-  const syd = new Date(now.getTime() + (11 * 3600000));
+  // Sydney DST: AEDT (UTC+11) first Sun Oct → first Sun Apr, else AEST (UTC+10)
+  const getSydOffset = () => {
+    const y = now.getUTCFullYear();
+    const dstEnd = new Date(Date.UTC(y, 3, 1 + (7 - new Date(Date.UTC(y, 3, 1)).getUTCDay()) % 7, 16)); // 1st Sun Apr 02:00 AEDT = 16:00 UTC
+    const dstStart = new Date(Date.UTC(y, 9, 1 + (7 - new Date(Date.UTC(y, 9, 1)).getUTCDay()) % 7, 16)); // 1st Sun Oct 02:00 AEST = 16:00 UTC
+    return (now >= dstStart || now < dstEnd) ? 11 : 10;
+  };
+  const sydOff = getSydOffset();
+  const syd = new Date(now.getTime() + (sydOff * 3600000));
   const lon = new Date(now);
   const ny = new Date(now.getTime() + (-5 * 3600000));
   document.getElementById('syd-time').textContent = fmt(syd.getUTCHours(), syd.getUTCMinutes());
@@ -1524,7 +1713,7 @@ function toggleCheck(idx, row) {
   checkState[checkItems[idx].label] = checkItems[idx].checked;
   document.getElementById('cb-' + idx).className = 'check-box' + (checkItems[idx].checked ? ' checked' : '');
   row.querySelector('.check-label').style.color = checkItems[idx].checked ? 'var(--text2)' : 'var(--text)';
-  saveState(); updateScore();
+  saveState(); saveChecklistCloud(); updateScore();
 }
 
 function updateScore() {
@@ -1588,6 +1777,7 @@ function logTrade() {
     notes: document.getElementById('f-notes').value
   });
   saveState(); toggleForm(); renderJournal();
+  saveTradeCloud(trades[0]);
   showToast('Trade logged', 'success');
   // clear form
   ['f-entry','f-sl','f-tp','f-rr','f-r','f-notes'].forEach(id => document.getElementById(id).value = '');
@@ -1595,7 +1785,9 @@ function logTrade() {
 
 function deleteTrade(id) {
   trades = trades.filter(t => t.id !== id);
-  saveState(); renderJournal(); showToast('Trade deleted');
+  saveState(); renderJournal();
+  deleteTradeCloud(id);
+  showToast('Trade deleted');
 }
 
 function clearAllTrades() {
@@ -2896,9 +3088,11 @@ function saveAnnotationLog(data) {
     outcome: 'pending' // win/loss/be — user updates later
   };
   annLog.unshift(entry);
-  // Keep max 100 entries
   if (annLog.length > 100) annLog = annLog.slice(0, 100);
   localStorage.setItem('ict_ann_log', JSON.stringify(annLog));
+  saveAnnotationCloud(entry).then(cloudId => {
+    if (cloudId) { entry.id = cloudId; localStorage.setItem('ict_ann_log', JSON.stringify(annLog)); }
+  });
   showToast('Setup saved to Annotation Log', 'success');
 }
 
@@ -2972,12 +3166,18 @@ function renderAnnLog() {
 
 function updateAnnOutcome(id, outcome) {
   const entry = annLog.find(e => e.id === id);
-  if (entry) { entry.outcome = outcome; localStorage.setItem('ict_ann_log', JSON.stringify(annLog)); renderAnnLog(); }
+  if (entry) {
+    entry.outcome = outcome;
+    localStorage.setItem('ict_ann_log', JSON.stringify(annLog));
+    updateAnnotationOutcomeCloud(id, outcome);
+    renderAnnLog();
+  }
 }
 
 function deleteAnnLog(id) {
   annLog = annLog.filter(e => e.id !== id);
   localStorage.setItem('ict_ann_log', JSON.stringify(annLog));
+  deleteAnnotationCloud(id);
   renderAnnLog(); showToast('Entry deleted');
 }
 
@@ -3215,6 +3415,7 @@ setInterval(updateClocks, 1000);
 setInterval(buildKillZones, 60000);
 setInterval(checkWeekend, 60000);
 setInterval(updateNewsCountdown, 60000);
+initSupabase();
 </script>
 </body>
 </html>
