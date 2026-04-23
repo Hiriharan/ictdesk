@@ -1611,6 +1611,8 @@ async function handlePasswordReset() {
     }
   }
 }
+
+async function signInWithGoogle() {
   try {
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider: 'google',
