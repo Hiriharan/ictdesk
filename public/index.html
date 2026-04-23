@@ -593,7 +593,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
 
 <!-- Mobile dropdown nav -->
 <div id="mobile-nav" style="display:none">
-  <button class="mob-nav-btn active" onclick="showTab('sessions',document.querySelector('.nav-btn.active'));closeBurger()">Sessions</button>
+  <button class="mob-nav-btn active" onclick="showTab('sessions',this);closeBurger()">Sessions</button>
   <button class="mob-nav-btn" onclick="showTab('checklist',this);closeBurger()">Confluence</button>
   <button class="mob-nav-btn" onclick="showTab('journal',this);closeBurger()">Journal</button>
   <button class="mob-nav-btn" onclick="showTab('analyzer',this);closeBurger()">AI Analyzer</button>
@@ -605,7 +605,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
   <div id="admin-nav-mobile" style="display:none">
     <button class="mob-nav-btn" style="color:var(--purple)" onclick="showTab('admin',this);closeBurger()">Admin</button>
   </div>
-  <div style="border-top:1px solid var(--border);margin:8px 0;padding-top:8px;display:flex;gap:8px;padding:12px 16px">
+  <div style="border-top:1px solid var(--border);padding:12px 16px;display:flex;gap:8px">
     <button class="settings-btn" onclick="openSettings();closeBurger()" style="flex:1">Settings</button>
     <button class="settings-btn" onclick="signOut()" style="flex:1;border-color:rgba(224,85,85,0.3);color:var(--red)">Sign Out</button>
   </div>
@@ -1913,8 +1913,8 @@ function showToast(msg, type = '') {
 function showTab(name, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  if (el) el.classList.add('active');
+  document.getElementById('tab-' + name)?.classList.add('active');
+  if (el && el.classList) el.classList.add('active');
   if (name === 'chart') setTimeout(loadTVChart, 100);
   if (name === 'analyzer') updateApiIndicator();
   if (name === 'scanner') updateApiIndicator();
@@ -1923,6 +1923,7 @@ function showTab(name, el) {
   if (name === 'annlog') renderAnnLog();
   if (name === 'signals') loadSignals();
   if (name === 'admin') loadAdminData();
+  if (typeof updateMobileNavActive === 'function') updateMobileNavActive(name);
 }
 
 // ─── SESSIONS & CLOCKS ───────────────────────────────────────────────────────
@@ -3661,12 +3662,16 @@ document.addEventListener('click', e => {
 });
 
 // Sync active tab highlight in mobile nav
-const origShowTab = showTab;
-function showTab(name, el) {
-  origShowTab(name, el);
-  // Update mobile nav active state
+// Update mobile nav active state when tab changes
+function updateMobileNavActive(name) {
   document.querySelectorAll('.mob-nav-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent.trim().toLowerCase().replace('. ','').replace(' ','') === name.toLowerCase().replace('annlog','ann.log').replace('checklist','confluence').replace('analyzer','aianalyzer').replace('annlog','ann.log'));
+    const btnText = b.textContent.trim().toLowerCase().replace(/\s+/g,'').replace('.','');
+    const tabName = name.toLowerCase();
+    const matches = btnText === tabName || 
+      (tabName === 'checklist' && btnText === 'confluence') ||
+      (tabName === 'analyzer' && btnText === 'aianalyzer') ||
+      (tabName === 'annlog' && btnText === 'annlog');
+    b.classList.toggle('active', matches);
   });
 }
 
