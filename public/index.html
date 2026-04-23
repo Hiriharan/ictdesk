@@ -3653,18 +3653,22 @@ async function loadSignals() {
 async function checkAdminStatus() {
   if (!supabaseClient || !currentUser) return;
   try {
-    const { data } = await supabaseClient
-      .from('admins').select('role')
-      .eq('user_id', currentUser.id).single();
-    if (data) {
+    // Use the security definer function to bypass RLS
+    const { data: adminCheck, error } = await supabaseClient
+      .rpc('is_admin', { user_uuid: currentUser.id });
+
+    if (adminCheck === true) {
       isAdmin = true;
+      // Get role
+      const { data: adminData } = await supabaseClient
+        .from('admins').select('role').eq('user_id', currentUser.id).single();
       document.getElementById('admin-nav').style.display = 'block';
-      document.getElementById('admin-role-badge').textContent = data.role || 'Admin';
+      if (adminData) document.getElementById('admin-role-badge').textContent = adminData.role || 'Admin';
     }
+
     // Check user tier
     const { data: profile } = await supabaseClient
-      .from('profiles').select('tier')
-      .eq('id', currentUser.id).single();
+      .from('profiles').select('tier').eq('id', currentUser.id).single();
     if (profile) {
       userTier = profile.tier || 'free';
       const tierBadge = document.getElementById('signal-user-tier');
@@ -3675,7 +3679,7 @@ async function checkAdminStatus() {
       const proBanner = document.getElementById('pro-banner');
       if (proBanner) proBanner.style.display = userTier === 'pro' ? 'none' : 'flex';
     }
-  } catch(e) {}
+  } catch(e) { console.error('Admin check error:', e); }
 }
 
 function filterSignals(filter, el) {
