@@ -314,7 +314,24 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
   .stat-val{font-size:18px}
 }
 
-/* SIGNALS */
+/* BURGER MENU */
+.burger-btn{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:6px;border-radius:4px}
+.burger-btn span{display:block;width:22px;height:2px;background:var(--text2);border-radius:2px;transition:all 0.3s}
+.burger-btn.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.burger-btn.open span:nth-child(2){opacity:0}
+.burger-btn.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+#mobile-nav{position:absolute;top:100%;left:0;right:0;background:var(--bg2);border-bottom:1px solid var(--border);z-index:200;flex-direction:column;padding:8px 0;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.mob-nav-btn{background:none;border:none;color:var(--text2);padding:12px 20px;cursor:pointer;font-family:'Syne',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;text-align:left;width:100%;transition:all 0.15s;border-bottom:1px solid var(--border)}
+.mob-nav-btn:hover,.mob-nav-btn.active{color:var(--gold);background:var(--bg3)}
+.mob-nav-btn:last-child{border-bottom:none}
+
+@media(max-width:768px){
+  .burger-btn{display:flex}
+  .nav{display:none}
+  .header-right .settings-btn{display:none}
+  #user-display{display:none}
+  .header{position:relative}
+}
 .signal-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden;transition:border-color 0.2s}
 .signal-card.free-signal{border-left:3px solid var(--text3)}
 .signal-card.pro-signal{border-left:3px solid var(--gold)}
@@ -550,23 +567,47 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
 <!-- HEADER -->
 <div class="header">
   <div class="logo">ICT Desk <span>+ TradingView</span></div>
-  <div class="nav">
-    <button class="nav-btn active" onclick="showTab('sessions',this)">Sessions</button>
-    <button class="nav-btn" onclick="showTab('checklist',this)">Confluence</button>
-    <button class="nav-btn" onclick="showTab('journal',this)">Journal</button>
-    <button class="nav-btn" onclick="showTab('analyzer',this)">AI Analyzer</button>
-    <button class="nav-btn" onclick="showTab('news',this)">News</button>
-    <button class="nav-btn" onclick="showTab('annotator',this)">Annotator</button>
-    <button class="nav-btn" onclick="showTab('annlog',this)">Ann. Log</button>
-    <button class="nav-btn" onclick="showTab('scanner',this)">Scanner</button>
-    <button class="nav-btn" onclick="showTab('signals',this)">Signals</button>
-    <div id="admin-nav" style="display:none"><button class="nav-btn" style="color:var(--purple);border-color:rgba(167,139,250,0.3)" onclick="showTab('admin',this)">Admin</button></div>
+  <div class="nav" id="main-nav">
+    <button class="nav-btn active" onclick="showTab('sessions',this);closeBurger()">Sessions</button>
+    <button class="nav-btn" onclick="showTab('checklist',this);closeBurger()">Confluence</button>
+    <button class="nav-btn" onclick="showTab('journal',this);closeBurger()">Journal</button>
+    <button class="nav-btn" onclick="showTab('analyzer',this);closeBurger()">AI Analyzer</button>
+    <button class="nav-btn" onclick="showTab('news',this);closeBurger()">News</button>
+    <button class="nav-btn" onclick="showTab('annotator',this);closeBurger()">Annotator</button>
+    <button class="nav-btn" onclick="showTab('annlog',this);closeBurger()">Ann. Log</button>
+    <button class="nav-btn" onclick="showTab('scanner',this);closeBurger()">Scanner</button>
+    <button class="nav-btn" onclick="showTab('signals',this);closeBurger()">Signals</button>
+    <div id="admin-nav" style="display:none"><button class="nav-btn" style="color:var(--purple);border-color:rgba(167,139,250,0.3)" onclick="showTab('admin',this);closeBurger()">Admin</button></div>
   </div>
   <div class="header-right">
     <span id="api-dot" class="api-indicator"></span>
     <span id="user-display" style="font-size:11px;color:var(--text3);font-family:'Space Mono',monospace;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+    <span id="tier-badge-header" style="display:none;font-size:10px;padding:2px 8px;border-radius:3px;font-family:'Space Mono',monospace;border:1px solid var(--border);color:var(--text3)">Free</span>
     <button class="settings-btn" onclick="signOut()" style="border-color:rgba(224,85,85,0.3);color:var(--red)">Sign Out</button>
-    <button class="settings-btn" onclick="openSettings()">Settings</button>
+    <button class="settings-btn" id="settings-btn-header" onclick="openSettings()">Settings</button>
+    <button class="burger-btn" id="burger-btn" onclick="toggleBurger()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</div>
+
+<!-- Mobile dropdown nav -->
+<div id="mobile-nav" style="display:none">
+  <button class="mob-nav-btn active" onclick="showTab('sessions',document.querySelector('.nav-btn.active'));closeBurger()">Sessions</button>
+  <button class="mob-nav-btn" onclick="showTab('checklist',this);closeBurger()">Confluence</button>
+  <button class="mob-nav-btn" onclick="showTab('journal',this);closeBurger()">Journal</button>
+  <button class="mob-nav-btn" onclick="showTab('analyzer',this);closeBurger()">AI Analyzer</button>
+  <button class="mob-nav-btn" onclick="showTab('news',this);closeBurger()">News</button>
+  <button class="mob-nav-btn" onclick="showTab('annotator',this);closeBurger()">Annotator</button>
+  <button class="mob-nav-btn" onclick="showTab('annlog',this);closeBurger()">Ann. Log</button>
+  <button class="mob-nav-btn" onclick="showTab('scanner',this);closeBurger()">Scanner</button>
+  <button class="mob-nav-btn" onclick="showTab('signals',this);closeBurger()">Signals</button>
+  <div id="admin-nav-mobile" style="display:none">
+    <button class="mob-nav-btn" style="color:var(--purple)" onclick="showTab('admin',this);closeBurger()">Admin</button>
+  </div>
+  <div style="border-top:1px solid var(--border);margin:8px 0;padding-top:8px;display:flex;gap:8px;padding:12px 16px">
+    <button class="settings-btn" onclick="openSettings();closeBurger()" style="flex:1">Settings</button>
+    <button class="settings-btn" onclick="signOut()" style="flex:1;border-color:rgba(224,85,85,0.3);color:var(--red)">Sign Out</button>
   </div>
 </div>
 
@@ -1410,18 +1451,40 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
   <div class="modal">
     <button class="modal-close" onclick="closeSettings()">×</button>
     <div class="modal-title">Settings</div>
-    <div class="modal-sub">Your API key is stored locally in your browser only — never sent to any server other than Anthropic directly.</div>
-    <label class="modal-label">Anthropic API Key</label>
-    <input class="modal-input" type="password" id="api-key-input" placeholder="sk-ant-...">
-    <label class="modal-label" style="margin-top:4px">Twelve Data API Key (for live scanner)</label>
-    <input class="modal-input" type="password" id="td-key-input" placeholder="your_twelvedata_key">
-    <div class="modal-actions">
-      <button class="btn primary" onclick="saveApiKey()">Save Keys</button>
-      <button class="btn danger" onclick="clearApiKey()">Remove Keys</button>
+
+    <!-- Admin-only API key section -->
+    <div id="settings-admin-section" style="display:none">
+      <div class="modal-sub">API keys are stored in your browser only — never sent to any server other than the respective API provider.</div>
+      <label class="modal-label">Anthropic API Key</label>
+      <input class="modal-input" type="password" id="api-key-input" placeholder="sk-ant-...">
+      <label class="modal-label" style="margin-top:4px">Twelve Data API Key (for live scanner)</label>
+      <input class="modal-input" type="password" id="td-key-input" placeholder="your_twelvedata_key">
+      <div class="modal-actions">
+        <button class="btn primary" onclick="saveApiKey()">Save Keys</button>
+        <button class="btn danger" onclick="clearApiKey()">Remove Keys</button>
+      </div>
+      <div class="modal-info">
+        Anthropic API: <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> · 
+        Twelve Data: <a href="https://twelvedata.com" target="_blank">twelvedata.com</a>
+      </div>
     </div>
-    <div class="modal-info">
-      Don't have an API key? Get one free at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>.
-      The AI Analyzer uses claude-sonnet-4-20250514. Typical analysis costs ~0.01 USD per request.
+
+    <!-- Regular user section -->
+    <div id="settings-user-section" style="display:none">
+      <div style="text-align:center;padding:20px 0">
+        <div style="font-size:32px;margin-bottom:12px">⚙️</div>
+        <div style="font-size:14px;color:var(--text);margin-bottom:8px;font-weight:700">Account Settings</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:20px">
+          Signed in as <span id="settings-email" style="color:var(--gold);font-family:'Space Mono',monospace"></span>
+        </div>
+        <div id="settings-tier-info" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px;margin-bottom:16px">
+          <div style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Current Plan</div>
+          <div id="settings-plan-name" style="font-size:18px;font-weight:700;font-family:'Space Mono',monospace;color:var(--gold)">Free</div>
+          <div id="settings-plan-desc" style="font-size:12px;color:var(--text2);margin-top:4px">Upgrade to Pro for full signals, AI analysis and scanner</div>
+        </div>
+        <button id="settings-upgrade-btn" class="btn primary" style="width:100%;margin-bottom:8px" onclick="showToast('Stripe coming soon — contact admin to upgrade');closeSettings()">Upgrade to Pro — $19/month</button>
+        <button class="btn danger" style="width:100%" onclick="signOut();closeSettings()">Sign Out</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1806,8 +1869,33 @@ function updateApiIndicator() {
   if (tdBanner) tdBanner.style.display = getTDKey() ? 'none' : 'block';
 }
 function openSettings() {
-  document.getElementById('api-key-input').value = getApiKey();
-  document.getElementById('td-key-input').value = getTDKey();
+  const adminSection = document.getElementById('settings-admin-section');
+  const userSection = document.getElementById('settings-user-section');
+  if (isAdmin) {
+    adminSection.style.display = 'block';
+    userSection.style.display = 'none';
+    document.getElementById('api-key-input').value = getApiKey();
+    document.getElementById('td-key-input').value = getTDKey();
+  } else {
+    adminSection.style.display = 'none';
+    userSection.style.display = 'block';
+    const emailEl = document.getElementById('settings-email');
+    if (emailEl && currentUser) emailEl.textContent = currentUser.email || '';
+    const planName = document.getElementById('settings-plan-name');
+    const planDesc = document.getElementById('settings-plan-desc');
+    const upgradeBtn = document.getElementById('settings-upgrade-btn');
+    if (userTier === 'pro') {
+      planName.textContent = 'Pro ✓';
+      planName.style.color = 'var(--green)';
+      planDesc.textContent = 'You have full access to all signals, AI analysis and scanner.';
+      upgradeBtn.style.display = 'none';
+    } else {
+      planName.textContent = 'Free';
+      planName.style.color = 'var(--gold)';
+      planDesc.textContent = 'Upgrade to Pro for full signals, AI analysis and live scanner.';
+      upgradeBtn.style.display = 'block';
+    }
+  }
   document.getElementById('settings-modal').classList.add('open');
 }
 function closeSettings() { document.getElementById('settings-modal').classList.remove('open'); }
@@ -2226,7 +2314,7 @@ function toggleTag(el) { el.className = 'tag-toggle' + (el.className.includes(' 
 
 async function analyzeSetup() {
   const apiKey = getApiKey();
-  if (!apiKey) { openSettings(); return; }
+  if (!apiKey) { if(isAdmin){openSettings();}else{showToast('AI features require a Pro subscription — contact admin to upgrade','error');} return; }
   const pair = document.getElementById('ai-pair').value;
   const tf = document.getElementById('ai-tf').value;
   const bias = document.getElementById('ai-bias').value;
@@ -2780,7 +2868,7 @@ async function reviewBtTrade(id) {
 
 async function aiBacktest() {
   const apiKey = getApiKey();
-  if (!apiKey) { openSettings(); return; }
+  if (!apiKey) { if(isAdmin){openSettings();}else{showToast('AI features require a Pro subscription — contact admin to upgrade','error');} return; }
   const name = document.getElementById('abt-name').value;
   const rules = document.getElementById('abt-rules').value;
   const pairsUsed = document.getElementById('abt-pairs').value;
@@ -2939,7 +3027,7 @@ function downloadAnnotated() {
 
 async function annotateChart() {
   const apiKey = getApiKey();
-  if (!apiKey) { openSettings(); return; }
+  if (!apiKey) { if(isAdmin){openSettings();}else{showToast('AI features require a Pro subscription — contact admin to upgrade','error');} return; }
   if (!annImageData) { showToast('Upload a chart first', 'error'); return; }
 
   const pair = document.getElementById('ann-pair').value;
@@ -3272,7 +3360,7 @@ async function runScan() {
   const tdKey = getTDKey();
   const apiKey = getApiKey();
   if (!tdKey) { openSettings(); return; }
-  if (!apiKey) { openSettings(); return; }
+  if (!apiKey) { if(isAdmin){openSettings();}else{showToast('AI features require a Pro subscription — contact admin to upgrade','error');} return; }
 
   const pair = document.getElementById('sc-pair').value;
   const tf = document.getElementById('sc-tf').value;
@@ -3549,6 +3637,39 @@ function clearAnnLog() {
   renderAnnLog(); showToast('Log cleared');
 }
 
+// ─── BURGER MENU ─────────────────────────────────────────────────────────────
+function toggleBurger() {
+  const btn = document.getElementById('burger-btn');
+  const nav = document.getElementById('mobile-nav');
+  const isOpen = nav.style.display === 'flex';
+  nav.style.display = isOpen ? 'none' : 'flex';
+  btn.classList.toggle('open', !isOpen);
+}
+
+function closeBurger() {
+  document.getElementById('mobile-nav').style.display = 'none';
+  document.getElementById('burger-btn').classList.remove('open');
+}
+
+// Close burger when clicking outside
+document.addEventListener('click', e => {
+  const nav = document.getElementById('mobile-nav');
+  const btn = document.getElementById('burger-btn');
+  if (nav && btn && !nav.contains(e.target) && !btn.contains(e.target)) {
+    closeBurger();
+  }
+});
+
+// Sync active tab highlight in mobile nav
+const origShowTab = showTab;
+function showTab(name, el) {
+  origShowTab(name, el);
+  // Update mobile nav active state
+  document.querySelectorAll('.mob-nav-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim().toLowerCase().replace('. ','').replace(' ','') === name.toLowerCase().replace('annlog','ann.log').replace('checklist','confluence').replace('analyzer','aianalyzer').replace('annlog','ann.log'));
+  });
+}
+
 // ─── TOP-DOWN GUIDE ───────────────────────────────────────────────────────────
 const TD_PAIRS = {
   XAUUSD: {
@@ -3788,10 +3909,11 @@ async function checkAdminStatus() {
 
     if (adminCheck === true) {
       isAdmin = true;
-      // Get role
       const { data: adminData } = await supabaseClient
         .from('admins').select('role').eq('user_id', currentUser.id).single();
       document.getElementById('admin-nav').style.display = 'block';
+      const mobileAdmin = document.getElementById('admin-nav-mobile');
+      if (mobileAdmin) mobileAdmin.style.display = 'block';
       if (adminData) document.getElementById('admin-role-badge').textContent = adminData.role || 'Admin';
     }
 
@@ -3807,6 +3929,20 @@ async function checkAdminStatus() {
       }
       const proBanner = document.getElementById('pro-banner');
       if (proBanner) proBanner.style.display = userTier === 'pro' ? 'none' : 'flex';
+
+      // Show tier badge in header for non-admins
+      if (!isAdmin) {
+        const tierHeader = document.getElementById('tier-badge-header');
+        if (tierHeader) {
+          tierHeader.style.display = 'inline';
+          tierHeader.textContent = userTier === 'pro' ? '★ Pro' : 'Free';
+          tierHeader.style.color = userTier === 'pro' ? 'var(--gold)' : 'var(--text3)';
+          tierHeader.style.borderColor = userTier === 'pro' ? 'var(--gold3)' : 'var(--border)';
+        }
+        // Hide API dot for non-admins
+        const apiDot = document.getElementById('api-dot');
+        if (apiDot) apiDot.style.display = 'none';
+      }
     }
   } catch(e) { console.error('Admin check error:', e); }
 }
