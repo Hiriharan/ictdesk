@@ -244,6 +244,60 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
   .nav-btn{font-size:11px;padding:5px 10px}
 }
 
+/* SIGNALS */
+.signal-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:12px;overflow:hidden;transition:border-color 0.2s}
+.signal-card.free-signal{border-left:3px solid var(--text3)}
+.signal-card.pro-signal{border-left:3px solid var(--gold)}
+.signal-card.active{border-left-color:var(--green)}
+.signal-card.closed-win{border-left-color:var(--green);opacity:0.8}
+.signal-card.closed-loss{border-left-color:var(--red);opacity:0.8}
+.signal-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border);flex-wrap:wrap}
+.signal-pair{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--gold2)}
+.signal-dir{font-size:11px;padding:3px 10px;border-radius:3px;font-family:'Space Mono',monospace}
+.signal-dir.long{background:rgba(61,187,122,0.15);color:var(--green)}
+.signal-dir.short{background:rgba(224,85,85,0.15);color:var(--red)}
+.signal-status{font-size:10px;padding:2px 8px;border-radius:3px;font-family:'Space Mono',monospace;border:1px solid}
+.signal-status.pending{color:var(--gold);border-color:var(--gold3);background:rgba(212,168,67,0.08)}
+.signal-status.active{color:var(--green);border-color:rgba(61,187,122,0.3);background:rgba(61,187,122,0.08)}
+.signal-status.hit-tp{color:var(--green);border-color:rgba(61,187,122,0.3)}
+.signal-status.hit-sl{color:var(--red);border-color:rgba(224,85,85,0.3)}
+.signal-status.cancelled{color:var(--text3);border-color:var(--border)}
+.signal-tier{font-size:10px;padding:2px 8px;border-radius:3px;font-family:'Space Mono',monospace}
+.signal-tier.free{background:var(--bg4);color:var(--text3);border:1px solid var(--border)}
+.signal-tier.pro{background:rgba(212,168,67,0.1);color:var(--gold);border:1px solid var(--gold3)}
+.signal-levels{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:12px 16px;border-bottom:1px solid var(--border)}
+@media(max-width:600px){.signal-levels{grid-template-columns:1fr 1fr}}
+.signal-level{text-align:center}
+.signal-level-label{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);margin-bottom:4px}
+.signal-level-val{font-family:'Space Mono',monospace;font-size:14px;font-weight:700}
+.signal-level-val.entry{color:var(--blue)}
+.signal-level-val.sl{color:var(--red)}
+.signal-level-val.tp{color:var(--gold)}
+.signal-analysis{padding:12px 16px;font-size:12px;color:var(--text2);line-height:1.7;border-bottom:1px solid var(--border)}
+.signal-footer{padding:10px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.signal-conf-tag{font-size:10px;padding:2px 7px;border-radius:3px;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:'Space Mono',monospace}
+.signal-took-btn{font-size:11px;padding:4px 12px;border-radius:4px;cursor:pointer;font-family:'Syne',sans-serif;letter-spacing:1px;text-transform:uppercase;transition:all 0.15s;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);margin-left:auto}
+.signal-took-btn.took{background:rgba(61,187,122,0.1);border-color:var(--green);color:var(--green)}
+.signal-locked{padding:32px;text-align:center}
+.signal-locked-icon{font-size:32px;margin-bottom:12px;color:var(--text3)}
+.pro-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(212,168,67,0.1);border:1px solid var(--gold3);border-radius:4px;padding:4px 12px;font-size:11px;color:var(--gold);font-family:'Space Mono',monospace}
+
+/* ADMIN */
+.admin-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.admin-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px}
+.admin-card-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.admin-card-val{font-size:28px;font-weight:700;font-family:'Space Mono',monospace;color:var(--gold)}
+.admin-section{background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:16px;overflow:hidden}
+.admin-section-header{padding:12px 16px;background:var(--bg3);border-bottom:1px solid var(--border);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text3);display:flex;align-items:center;justify-content:space-between}
+.admin-table{width:100%;border-collapse:collapse}
+.admin-table th{padding:10px 14px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);text-align:left;background:var(--bg3);border-bottom:1px solid var(--border)}
+.admin-table td{padding:10px 14px;font-size:12px;color:var(--text);border-bottom:1px solid var(--border)}
+.admin-table tr:last-child td{border-bottom:none}
+.admin-table tr:hover td{background:var(--bg3)}
+.create-signal-form{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:20px;margin-bottom:16px}
+.form-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px}
+@media(max-width:600px){.form-row{grid-template-columns:1fr 1fr}}
+
 /* SCANNER */
 .scanner-grid{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
 @media(max-width:800px){.scanner-grid{grid-template-columns:1fr}}
@@ -432,6 +486,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
     <button class="nav-btn" onclick="showTab('annotator',this)">Annotator</button>
     <button class="nav-btn" onclick="showTab('annlog',this)">Ann. Log</button>
     <button class="nav-btn" onclick="showTab('scanner',this)">Scanner</button>
+    <button class="nav-btn" onclick="showTab('signals',this)">Signals</button>
+    <div id="admin-nav" style="display:none"><button class="nav-btn" style="color:var(--purple);border-color:rgba(167,139,250,0.3)" onclick="showTab('admin',this)">Admin</button></div>
   </div>
   <div class="header-right">
     <span id="api-dot" class="api-indicator"></span>
@@ -1140,6 +1196,142 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
   <div id="annlog-body"></div>
 </div>
 
+<!-- SIGNALS TAB -->
+<div class="content tab" id="tab-signals">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px">Trading Signals</div>
+      <div style="font-size:12px;color:var(--text3)">Live trade ideas from the desk — entry, SL and TP included</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="signal-user-tier" class="signal-tier free">Free</span>
+      <div id="signals-filter" style="display:flex;gap:4px">
+        <button class="ff-tab-btn active" data-filter="all" onclick="filterSignals('all',this)">All</button>
+        <button class="ff-tab-btn" data-filter="active" onclick="filterSignals('active',this)">Active</button>
+        <button class="ff-tab-btn" data-filter="closed" onclick="filterSignals('closed',this)">Closed</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pro upgrade banner (shown to free users) -->
+  <div id="pro-banner" style="background:rgba(212,168,67,0.06);border:1px solid rgba(212,168,67,0.2);border-radius:8px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-size:13px;color:var(--gold2);font-weight:700;margin-bottom:4px">Upgrade to Pro for full signals</div>
+      <div style="font-size:12px;color:var(--text3)">Free users see 1 signal preview per week. Pro gets all signals with full entry, SL and TP in real time.</div>
+    </div>
+    <button class="btn primary" onclick="showToast('Stripe coming soon — contact admin to upgrade')">Upgrade to Pro</button>
+  </div>
+
+  <div id="signals-list"></div>
+  <div id="signals-empty" style="display:none;padding:40px;text-align:center;color:var(--text3);font-size:13px">No signals yet. Check back soon.</div>
+</div>
+
+<!-- ADMIN TAB -->
+<div class="content tab" id="tab-admin">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-size:18px;font-weight:700;color:var(--purple);margin-bottom:4px">Admin Portal</div>
+      <div style="font-size:12px;color:var(--text3)">Manage signals, users and platform stats</div>
+    </div>
+    <span style="font-size:11px;font-family:'Space Mono',monospace;color:var(--purple);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);padding:4px 12px;border-radius:4px" id="admin-role-badge">Admin</span>
+  </div>
+
+  <!-- Stats -->
+  <div class="admin-grid" id="admin-stats">
+    <div class="admin-card"><div class="admin-card-label">Total Users</div><div class="admin-card-val" id="stat-users">—</div></div>
+    <div class="admin-card"><div class="admin-card-label">Pro Users</div><div class="admin-card-val" id="stat-pro">—</div></div>
+    <div class="admin-card"><div class="admin-card-label">Total Signals</div><div class="admin-card-val" id="stat-signals">—</div></div>
+    <div class="admin-card"><div class="admin-card-label">Signal Win Rate</div><div class="admin-card-val" id="stat-winrate">—</div></div>
+  </div>
+
+  <!-- Create Signal -->
+  <div class="admin-section">
+    <div class="admin-section-header">
+      <span>Create New Signal</span>
+      <button class="btn primary" onclick="toggleCreateSignal()" id="create-signal-toggle">+ New Signal</button>
+    </div>
+    <div id="create-signal-form" style="display:none;padding:20px">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Pair</label><select class="form-select" id="sig-pair"><option>XAUUSD</option><option>EURUSD</option><option>GBPUSD</option><option>AUDUSD</option><option>USDJPY</option></select></div>
+        <div class="form-group"><label class="form-label">Direction</label><select class="form-select" id="sig-dir"><option>Long</option><option>Short</option></select></div>
+        <div class="form-group"><label class="form-label">Timeframe</label><select class="form-select" id="sig-tf"><option>15M</option><option>5M</option><option>1H</option><option>4H</option></select></div>
+        <div class="form-group"><label class="form-label">Session</label><select class="form-select" id="sig-sess"><option>London Open</option><option>NY Open</option><option>Silver Bullet</option><option>Asian</option></select></div>
+        <div class="form-group"><label class="form-label">Entry Low</label><input class="form-input" id="sig-entry-low" type="number" step="0.00001" placeholder="2318.00"></div>
+        <div class="form-group"><label class="form-label">Entry High</label><input class="form-input" id="sig-entry-high" type="number" step="0.00001" placeholder="2320.00"></div>
+        <div class="form-group"><label class="form-label">Stop Loss</label><input class="form-input" id="sig-sl" type="number" step="0.00001" placeholder="2310.00"></div>
+        <div class="form-group"><label class="form-label">TP1</label><input class="form-input" id="sig-tp1" type="number" step="0.00001" placeholder="2340.00"></div>
+        <div class="form-group"><label class="form-label">TP2</label><input class="form-input" id="sig-tp2" type="number" step="0.00001" placeholder="2360.00"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:10px">
+        <label class="form-label">Confluences</label>
+        <div class="tag-row" id="sig-conf-tags">
+          <span class="tag-toggle" onclick="toggleTag(this)">FVG</span>
+          <span class="tag-toggle" onclick="toggleTag(this)">OB</span>
+          <span class="tag-toggle" onclick="toggleTag(this)">Liq Sweep</span>
+          <span class="tag-toggle" onclick="toggleTag(this)">BOS</span>
+          <span class="tag-toggle" onclick="toggleTag(this)">CHoCH</span>
+          <span class="tag-toggle" onclick="toggleTag(this)">OTE</span>
+          <span class="tag-toggle" onclick="toggleTag(this)">Kill Zone</span>
+          <span class="tag-toggle" onclick="toggleTag(this)">SMT Div</span>
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:10px">
+        <label class="form-label">Analysis / Reasoning</label>
+        <textarea class="form-textarea" id="sig-analysis" style="min-height:80px" placeholder="Explain the setup — what do you see, why this entry, what are the risks..."></textarea>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="form-group" style="flex:1">
+          <label class="form-label">Tier</label>
+          <select class="form-select" id="sig-tier">
+            <option value="free">Free (teaser — entry zone hidden)</option>
+            <option value="pro">Pro only (full details)</option>
+          </select>
+        </div>
+        <button class="btn primary" onclick="publishSignal()" style="margin-top:16px;padding:10px 20px">Publish Signal</button>
+        <button class="btn" onclick="toggleCreateSignal()" style="margin-top:16px">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Signals Management -->
+  <div class="admin-section" style="margin-bottom:16px">
+    <div class="admin-section-header"><span>Manage Signals</span></div>
+    <div style="overflow-x:auto">
+      <table class="admin-table" id="admin-signals-table">
+        <thead><tr>
+          <th>Time</th><th>Pair</th><th>Dir</th><th>Entry</th><th>SL</th><th>TP1</th><th>Status</th><th>Tier</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="admin-signals-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Users Management -->
+  <div class="admin-section" style="margin-bottom:16px">
+    <div class="admin-section-header"><span>Users</span></div>
+    <div style="overflow-x:auto">
+      <table class="admin-table">
+        <thead><tr><th>Email</th><th>Tier</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody id="admin-users-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Admins Management -->
+  <div class="admin-section">
+    <div class="admin-section-header">
+      <span>Admin Team</span>
+      <button class="btn" onclick="promptAddAdmin()" style="font-size:11px;padding:4px 12px">+ Add Admin</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="admin-table">
+        <thead><tr><th>User ID</th><th>Role</th><th>Added</th><th>Actions</th></tr></thead>
+        <tbody id="admin-admins-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <!-- SETTINGS MODAL -->
 <div class="modal-overlay" id="settings-modal">
   <div class="modal">
@@ -1316,6 +1508,8 @@ function unlockApp(user) {
   if (display) display.textContent = user.email?.split('@')[0] || 'Trader';
   // Load cloud data after login
   loadCloudData();
+  checkAdminStatus();
+  loadSignals();
 }
 
 // ─── SUPABASE DATA SYNC ───────────────────────────────────────────────────────
@@ -1510,6 +1704,8 @@ function showTab(name, el) {
   if (name === 'news') loadNewsCalendar();
   if (name === 'topdown') renderTDGuide();
   if (name === 'annlog') renderAnnLog();
+  if (name === 'signals') loadSignals();
+  if (name === 'admin') loadAdminData();
 }
 
 // ─── SESSIONS & CLOCKS ───────────────────────────────────────────────────────
@@ -3436,6 +3632,292 @@ function sendTDToAnalyzer() {
   document.getElementById('ai-pair').value = document.querySelector(`#td-pair-tabs .td-pair-btn.active`)?.dataset.pair || 'XAUUSD';
   document.getElementById('ai-context').value = `Top-down analysis score: ${score}/${max}\nPair: ${tdCurrentPair}\nConfluences confirmed: ${checked.join(', ') || 'none yet'}`;
   showTab('analyzer', document.querySelectorAll('.nav-btn')[3]);
+}
+
+// ─── SIGNALS ──────────────────────────────────────────────────────────────────
+let allSignals = [];
+let signalFilter = 'all';
+let isAdmin = false;
+let userTier = 'free';
+
+async function loadSignals() {
+  if (!supabaseClient) return;
+  try {
+    const { data } = await supabaseClient
+      .from('signals').select('*')
+      .order('created_at', { ascending: false });
+    if (data) { allSignals = data; renderSignals(); }
+  } catch(e) { console.error('Load signals error:', e); }
+}
+
+async function checkAdminStatus() {
+  if (!supabaseClient || !currentUser) return;
+  try {
+    const { data } = await supabaseClient
+      .from('admins').select('role')
+      .eq('user_id', currentUser.id).single();
+    if (data) {
+      isAdmin = true;
+      document.getElementById('admin-nav').style.display = 'block';
+      document.getElementById('admin-role-badge').textContent = data.role || 'Admin';
+    }
+    // Check user tier
+    const { data: profile } = await supabaseClient
+      .from('profiles').select('tier')
+      .eq('id', currentUser.id).single();
+    if (profile) {
+      userTier = profile.tier || 'free';
+      const tierBadge = document.getElementById('signal-user-tier');
+      if (tierBadge) {
+        tierBadge.textContent = userTier === 'pro' ? 'Pro' : 'Free';
+        tierBadge.className = 'signal-tier ' + userTier;
+      }
+      const proBanner = document.getElementById('pro-banner');
+      if (proBanner) proBanner.style.display = userTier === 'pro' ? 'none' : 'flex';
+    }
+  } catch(e) {}
+}
+
+function filterSignals(filter, el) {
+  signalFilter = filter;
+  document.querySelectorAll('#signals-filter .ff-tab-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderSignals();
+}
+
+function renderSignals() {
+  const list = document.getElementById('signals-list');
+  const empty = document.getElementById('signals-empty');
+  let filtered = [...allSignals];
+  if (signalFilter === 'active') filtered = filtered.filter(s => s.status === 'active' || s.status === 'pending');
+  if (signalFilter === 'closed') filtered = filtered.filter(s => ['hit-tp','hit-sl','cancelled'].includes(s.status));
+  if (!filtered.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  // Free users only see 1 free signal fully, rest are locked
+  let freeCount = 0;
+  list.innerHTML = filtered.map(sig => {
+    const isFree = sig.tier === 'free';
+    const canSee = isAdmin || userTier === 'pro' || (isFree && freeCount === 0);
+    if (isFree && freeCount === 0) freeCount++;
+    const dir = sig.direction?.toLowerCase();
+    const statusClass = sig.status?.replace(' ','-') || 'pending';
+    const date = new Date(sig.created_at).toLocaleString();
+    const confs = sig.confluences || [];
+
+    if (!canSee) {
+      return `<div class="signal-card pro-signal">
+        <div class="signal-header">
+          <span class="signal-pair">${sig.pair}</span>
+          <span class="signal-dir ${dir}">${sig.direction}</span>
+          <span class="signal-tier pro">Pro</span>
+          <span class="signal-status ${statusClass}">${sig.status || 'pending'}</span>
+          <span style="font-size:11px;color:var(--text3);margin-left:auto">${date}</span>
+        </div>
+        <div class="signal-locked">
+          <div class="signal-locked-icon">🔒</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Full signal details available for Pro members</div>
+          <div style="display:flex;gap:10px;justify-content:center;font-family:'Space Mono',monospace;font-size:12px;color:var(--text3)">
+            <span>Entry: ••••••</span><span>SL: ••••••</span><span>TP: ••••••</span>
+          </div>
+          <button class="btn primary" style="margin-top:14px" onclick="showToast('Stripe coming soon — contact admin to upgrade')">Upgrade to Pro →</button>
+        </div>
+      </div>`;
+    }
+
+    return `<div class="signal-card ${isFree ? 'free-signal' : 'pro-signal'} ${statusClass}">
+      <div class="signal-header">
+        <span class="signal-pair">${sig.pair}</span>
+        <span class="signal-dir ${dir}">${sig.direction}</span>
+        <span class="signal-tier ${sig.tier}">${sig.tier === 'pro' ? 'Pro' : 'Free'}</span>
+        <span class="signal-status ${statusClass}">${(sig.status || 'pending').replace('-',' ').toUpperCase()}</span>
+        <span style="font-size:11px;color:var(--text3);margin-left:auto">${date}</span>
+        <span style="font-size:11px;color:var(--text2)">${sig.session || ''} · ${sig.timeframe || ''}</span>
+      </div>
+      <div class="signal-levels">
+        <div class="signal-level">
+          <div class="signal-level-label">Entry Zone</div>
+          <div class="signal-level-val entry">${sig.entry_low} – ${sig.entry_high}</div>
+        </div>
+        <div class="signal-level">
+          <div class="signal-level-label">Stop Loss</div>
+          <div class="signal-level-val sl">${sig.sl}</div>
+        </div>
+        <div class="signal-level">
+          <div class="signal-level-label">TP 1</div>
+          <div class="signal-level-val tp">${sig.tp1}</div>
+        </div>
+        <div class="signal-level">
+          <div class="signal-level-label">TP 2</div>
+          <div class="signal-level-val tp">${sig.tp2 || '—'}</div>
+        </div>
+      </div>
+      ${sig.analysis ? `<div class="signal-analysis">${sig.analysis}</div>` : ''}
+      <div class="signal-footer">
+        ${confs.map ? confs.map(c => `<span class="signal-conf-tag">${c}</span>`).join('') : ''}
+        <button class="signal-took-btn" onclick="toggleTookTrade(${sig.id}, this)">I took this trade</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function toggleTookTrade(signalId, btn) {
+  if (!supabaseClient || !currentUser) return;
+  const took = !btn.classList.contains('took');
+  btn.classList.toggle('took');
+  btn.textContent = took ? '✓ Trade taken' : 'I took this trade';
+  try {
+    await supabaseClient.from('signal_results').upsert({
+      signal_id: signalId, user_id: currentUser.id, took_trade: took
+    }, { onConflict: 'signal_id,user_id' });
+  } catch(e) { console.error('Signal result error:', e); }
+}
+
+// ─── ADMIN ────────────────────────────────────────────────────────────────────
+function toggleCreateSignal() {
+  const form = document.getElementById('create-signal-form');
+  form.style.display = form.style.display === 'none' ? 'block' : 'none';
+}
+
+async function publishSignal() {
+  if (!supabaseClient || !currentUser || !isAdmin) return;
+  const pair = document.getElementById('sig-pair').value;
+  const direction = document.getElementById('sig-dir').value;
+  const tf = document.getElementById('sig-tf').value;
+  const sess = document.getElementById('sig-sess').value;
+  const entryLow = parseFloat(document.getElementById('sig-entry-low').value);
+  const entryHigh = parseFloat(document.getElementById('sig-entry-high').value);
+  const sl = parseFloat(document.getElementById('sig-sl').value);
+  const tp1 = parseFloat(document.getElementById('sig-tp1').value);
+  const tp2 = parseFloat(document.getElementById('sig-tp2').value) || null;
+  const analysis = document.getElementById('sig-analysis').value;
+  const tier = document.getElementById('sig-tier').value;
+  const confs = [...document.querySelectorAll('#sig-conf-tags .tag-toggle.on')].map(t => t.textContent);
+
+  if (!pair || !direction || isNaN(entryLow) || isNaN(sl) || isNaN(tp1)) {
+    showToast('Fill in all required fields', 'error'); return;
+  }
+
+  try {
+    const { error } = await supabaseClient.from('signals').insert({
+      created_by: currentUser.id, pair, direction,
+      timeframe: tf, session: sess,
+      entry_low: entryLow, entry_high: entryHigh,
+      sl, tp1, tp2, analysis, tier,
+      confluences: confs, status: 'active'
+    });
+    if (error) throw error;
+    showToast('Signal published!', 'success');
+    toggleCreateSignal();
+    loadSignals();
+    loadAdminData();
+    // Reset form
+    document.getElementById('sig-analysis').value = '';
+    document.querySelectorAll('#sig-conf-tags .tag-toggle.on').forEach(t => t.classList.remove('on'));
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function updateSignalStatus(id, status) {
+  if (!supabaseClient || !isAdmin) return;
+  try {
+    await supabaseClient.from('signals').update({ status }).eq('id', id);
+    showToast('Signal updated', 'success');
+    loadSignals(); loadAdminData();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function loadAdminData() {
+  if (!supabaseClient || !isAdmin) return;
+  try {
+    // Signals
+    const { data: sigs } = await supabaseClient.from('signals').select('*').order('created_at', { ascending: false });
+    const wins = (sigs || []).filter(s => s.status === 'hit-tp').length;
+    const closed = (sigs || []).filter(s => ['hit-tp','hit-sl'].includes(s.status)).length;
+    document.getElementById('stat-signals').textContent = (sigs || []).length;
+    document.getElementById('stat-winrate').textContent = closed ? Math.round(wins/closed*100) + '%' : '—';
+
+    // Admin signals table
+    const sigBody = document.getElementById('admin-signals-body');
+    sigBody.innerHTML = (sigs || []).slice(0, 20).map(s => `
+      <tr>
+        <td style="font-size:11px;color:var(--text3)">${new Date(s.created_at).toLocaleDateString()}</td>
+        <td style="font-family:'Space Mono',monospace;color:var(--gold2);font-weight:700">${s.pair}</td>
+        <td><span class="signal-dir ${s.direction?.toLowerCase()}" style="font-size:10px;padding:2px 6px">${s.direction}</span></td>
+        <td style="font-family:'Space Mono',monospace;font-size:11px">${s.entry_low}–${s.entry_high}</td>
+        <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--red)">${s.sl}</td>
+        <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--gold)">${s.tp1}</td>
+        <td><span class="signal-status ${(s.status||'pending').replace(' ','-')}">${(s.status||'pending').toUpperCase()}</span></td>
+        <td><span class="signal-tier ${s.tier}">${s.tier}</span></td>
+        <td>
+          <select onchange="updateSignalStatus(${s.id}, this.value)" style="background:var(--bg3);border:1px solid var(--border);border-radius:3px;color:var(--text);padding:3px 6px;font-size:11px;cursor:pointer">
+            <option value="active" ${s.status==='active'?'selected':''}>Active</option>
+            <option value="pending" ${s.status==='pending'?'selected':''}>Pending</option>
+            <option value="hit-tp" ${s.status==='hit-tp'?'selected':''}>Hit TP</option>
+            <option value="hit-sl" ${s.status==='hit-sl'?'selected':''}>Hit SL</option>
+            <option value="cancelled" ${s.status==='cancelled'?'selected':''}>Cancelled</option>
+          </select>
+        </td>
+      </tr>`).join('');
+
+    // Users
+    const { data: profiles } = await supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
+    const proUsers = (profiles || []).filter(p => p.tier === 'pro').length;
+    document.getElementById('stat-users').textContent = (profiles || []).length;
+    document.getElementById('stat-pro').textContent = proUsers;
+    const usersBody = document.getElementById('admin-users-body');
+    usersBody.innerHTML = (profiles || []).map(p => `
+      <tr>
+        <td style="font-size:12px">${p.email || '—'}</td>
+        <td><span class="signal-tier ${p.tier}">${p.tier || 'free'}</span></td>
+        <td style="font-size:11px;color:var(--text3)">${new Date(p.created_at).toLocaleDateString()}</td>
+        <td>
+          <select onchange="updateUserTier('${p.id}', this.value)" style="background:var(--bg3);border:1px solid var(--border);border-radius:3px;color:var(--text);padding:3px 6px;font-size:11px;cursor:pointer">
+            <option value="free" ${p.tier==='free'?'selected':''}>Free</option>
+            <option value="pro" ${p.tier==='pro'?'selected':''}>Pro</option>
+          </select>
+        </td>
+      </tr>`).join('');
+
+    // Admins
+    const { data: adminList } = await supabaseClient.from('admins').select('*').order('added_at', { ascending: false });
+    const adminsBody = document.getElementById('admin-admins-body');
+    adminsBody.innerHTML = (adminList || []).map(a => `
+      <tr>
+        <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--text2)">${a.user_id}</td>
+        <td><span style="font-size:11px;color:var(--purple);background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.3);padding:2px 8px;border-radius:3px">${a.role}</span></td>
+        <td style="font-size:11px;color:var(--text3)">${new Date(a.added_at).toLocaleDateString()}</td>
+        <td><button class="del-btn" onclick="removeAdmin('${a.user_id}')">Remove</button></td>
+      </tr>`).join('');
+
+  } catch(e) { console.error('Admin data error:', e); }
+}
+
+async function updateUserTier(userId, tier) {
+  if (!supabaseClient || !isAdmin) return;
+  try {
+    await supabaseClient.from('profiles').update({ tier }).eq('id', userId);
+    showToast('User tier updated to ' + tier, 'success');
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function promptAddAdmin() {
+  const userId = prompt('Enter the user UUID to grant admin access:');
+  if (!userId || !userId.trim()) return;
+  try {
+    await supabaseClient.from('admins').insert({ user_id: userId.trim(), role: 'admin', added_by: currentUser.id });
+    showToast('Admin added', 'success');
+    loadAdminData();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
+}
+
+async function removeAdmin(userId) {
+  if (userId === currentUser.id) { showToast('Cannot remove yourself', 'error'); return; }
+  if (!confirm('Remove this admin?')) return;
+  try {
+    await supabaseClient.from('admins').delete().eq('user_id', userId);
+    showToast('Admin removed');
+    loadAdminData();
+  } catch(e) { showToast('Error: ' + e.message, 'error'); }
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
