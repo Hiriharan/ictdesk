@@ -1444,6 +1444,52 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
       </table>
     </div>
   </div>
+
+  <!-- Email Leads -->
+  <div class="admin-section" style="margin-bottom:16px">
+    <div class="admin-section-header">
+      <span>Email Leads <span id="leads-count" style="color:var(--text3);font-size:11px"></span></span>
+      <button class="btn primary" onclick="sendPromoEmail()" style="font-size:11px;padding:4px 14px">Send Promo Email</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="admin-table">
+        <thead><tr><th>Email</th><th>Source</th><th>Joined</th><th>Subscribed</th></tr></thead>
+        <tbody id="admin-leads-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Send Promo Email Modal -->
+  <div id="promo-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;display:none;align-items:center;justify-content:center">
+    <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:24px;width:90%;max-width:520px;max-height:90vh;overflow-y:auto">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <div style="font-size:14px;font-weight:700;color:var(--text)">Send Promotional Email</div>
+        <button onclick="document.getElementById('promo-modal').style.display='none'" style="background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer">×</button>
+      </div>
+      <div class="form-group" style="margin-bottom:10px">
+        <label class="form-label">Recipients</label>
+        <select class="form-select" id="promo-recipients">
+          <option value="all">All leads (waitlist)</option>
+          <option value="free">Free users (in app)</option>
+          <option value="pro">Pro users only</option>
+          <option value="max">Max users only</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:10px">
+        <label class="form-label">Subject</label>
+        <input class="form-input" id="promo-subject" placeholder="e.g. 🚀 Special launch offer — 30% off Pro">
+      </div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label">Message</label>
+        <textarea class="form-textarea" id="promo-body" style="min-height:120px" placeholder="Write your promotional message here..."></textarea>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn primary" onclick="confirmSendPromo()" style="flex:1">Send Email</button>
+        <button class="btn" onclick="document.getElementById('promo-modal').style.display='none'" style="flex:1">Cancel</button>
+      </div>
+      <div id="promo-status" style="margin-top:10px;font-size:12px;text-align:center"></div>
+    </div>
+  </div>
 </div>
 
 <!-- SETTINGS MODAL -->
@@ -2314,8 +2360,9 @@ function renderPreviews() {
 function toggleTag(el) { el.className = 'tag-toggle' + (el.className.includes(' on') ? '' : ' on'); }
 
 async function analyzeSetup() {
+  if (!checkFeatureAccess("analyzer")) return;
   const apiKey = getApiKey();
-  if (!apiKey) { if(isAdmin){openSettings();}else{showToast('AI features require a Pro subscription — contact admin to upgrade','error');} return; }
+  if (!apiKey) { openSettings(); return; }
   const pair = document.getElementById('ai-pair').value;
   const tf = document.getElementById('ai-tf').value;
   const bias = document.getElementById('ai-bias').value;
@@ -3027,6 +3074,7 @@ function downloadAnnotated() {
 }
 
 async function annotateChart() {
+  if (!checkFeatureAccess("annotator")) return;
   const apiKey = getApiKey();
   if (!apiKey) { if(isAdmin){openSettings();}else{showToast('AI features require a Pro subscription — contact admin to upgrade','error');} return; }
   if (!annImageData) { showToast('Upload a chart first', 'error'); return; }
@@ -3358,6 +3406,7 @@ async function fetchTDData(symbol, tf, tdKey) {
 }
 
 async function runScan() {
+  if (!checkFeatureAccess("scanner")) return;
   const tdKey = getTDKey();
   const apiKey = getApiKey();
   if (!tdKey) { openSettings(); return; }
@@ -3498,6 +3547,56 @@ async function getClaudeVerdict(d) {
   } catch(e) {
     document.getElementById('sc-verdict').innerHTML = `<span style="color:var(--red)">Claude error: ${e.message}</span>`;
   }
+}
+
+function sendPromoEmail() {
+  document.getElementById('promo-modal').style.display = 'flex';
+  document.getElementById('promo-status').textContent = '';
+}
+
+async function confirmSendPromo() {
+  const subject = document.getElementById('promo-subject').value.trim();
+  const body = document.getElementById('promo-body').value.trim();
+  const recipients = document.getElementById('promo-recipients').value;
+  const status = document.getElementById('promo-status');
+
+  if (!subject || !body) { status.style.color='var(--red)'; status.textContent='Please fill in subject and message'; return; }
+
+  status.style.color = 'var(--text3)';
+  status.textContent = 'Sending...';
+
+  try {
+    const res = await fetch('/api/send-promo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subject, body, recipients })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      status.style.color = 'var(--green)';
+      status.textContent = `Sent to ${data.count || 0} recipients`;
+      setTimeout(() => document.getElementById('promo-modal').style.display = 'none', 2000);
+    } else throw new Error(data.error || 'Failed');
+  } catch(e) {
+    status.style.color = 'var(--red)';
+    status.textContent = 'Error: ' + e.message;
+  }
+}
+
+// ─── FEATURE GATING ───────────────────────────────────────────────────────────
+function checkFeatureAccess(feature) {
+  // Admin always has full access
+  if (isAdmin) return true;
+  // Pro and Max have full access
+  if (userTier === 'pro' || userTier === 'max') return true;
+  // Free tier — no app access
+  showToast('This feature requires a Pro or Max subscription', 'error');
+  setTimeout(() => {
+    if (confirm('Upgrade to Pro for full access to ICT Desk?\n\nPro: $19/month\nMax: $49/month')) {
+      showToast('Contact admin to upgrade your account');
+    }
+  }, 300);
+  return false;
 }
 
 // ─── ANNOTATION LOG ───────────────────────────────────────────────────────────
@@ -4186,6 +4285,22 @@ async function loadAdminData() {
         <td><button class="del-btn" onclick="removeAdmin('${a.user_id}')">Remove</button></td>
       </tr>`).join('');
 
+    // Email leads
+    const { data: leads } = await supabaseClient
+      .from('email_leads').select('*')
+      .order('created_at', { ascending: false });
+    const leadsCount = document.getElementById('leads-count');
+    if (leadsCount) leadsCount.textContent = `(${(leads||[]).length} total)`;
+    const leadsBody = document.getElementById('admin-leads-body');
+    if (leadsBody) {
+      leadsBody.innerHTML = (leads || []).slice(0, 50).map(l => `
+        <tr>
+          <td style="font-size:12px">${l.email}</td>
+          <td style="font-size:11px;color:var(--text3)">${l.source || 'landing'}</td>
+          <td style="font-size:11px;color:var(--text3)">${new Date(l.created_at).toLocaleDateString()}</td>
+          <td><span style="font-size:11px;color:${l.subscribed?'var(--green)':'var(--red)'}">${l.subscribed?'Yes':'No'}</span></td>
+        </tr>`).join('');
+    }
   } catch(e) { console.error('Admin data error:', e); }
 }
 

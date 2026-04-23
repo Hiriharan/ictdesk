@@ -108,8 +108,10 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:32px 40p
   .features-grid{grid-template-columns:1fr}
   .signals-section{padding:60px 20px}
   .signals-inner{grid-template-columns:1fr;gap:32px}
-  .pricing-grid{grid-template-columns:1fr;max-width:100%}
+  #pricing > div[style*="grid-template-columns"]{grid-template-columns:1fr !important;max-width:420px}
   .sp-levels{grid-template-columns:1fr 1fr}
+  #email-capture{padding:60px 20px}
+  #email-form{flex-direction:column}
   .cta-section{padding:60px 20px}
   footer{padding:24px 20px;flex-direction:column;text-align:center}
   .footer-links{justify-content:center}
@@ -124,7 +126,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:32px 40p
     <a href="#features">Features</a>
     <a href="#signals">Signals</a>
     <a href="#pricing">Pricing</a>
-    <a href="app/index.html" class="nav-cta">Open App</a>
+    <a href="/app" class="nav-cta">Open App</a>
   </div>
 </nav>
 
@@ -135,7 +137,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:32px 40p
     <h1>Trade Smarter with<br><span>ICT Methodology</span></h1>
     <p class="hero-sub">A professional trading suite built around Inner Circle Trader concepts. Live signals, AI-powered analysis, confluence checklists, and a full trade journal — all in one platform.</p>
     <div class="hero-btns">
-      <a href="app/index.html" class="btn-primary">Start Trading Free</a>
+      <a href="/app" class="btn-primary">Start Trading Free</a>
       <a href="#features" class="btn-secondary">See Features</a>
     </div>
   </div>
@@ -210,7 +212,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:32px 40p
       <div class="section-tag">Live Signals</div>
       <h2 class="section-title">Trade ideas straight to your screen</h2>
       <p style="font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:24px">Get live ICT-based trade signals with full entry zone, stop loss and take profit. Free users get 1 preview per week. Pro members get every signal in real time with full details and instant email notifications.</p>
-      <a href="app/index.html" class="btn-primary">View Live Signals</a>
+      <a href="/app" class="btn-primary">View Live Signals</a>
     </div>
     <div>
       <div class="signal-preview">
@@ -235,40 +237,76 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:32px 40p
 <section class="section" id="pricing" style="text-align:center">
   <div class="section-tag">Pricing</div>
   <h2 class="section-title">Simple, transparent pricing</h2>
-  <p class="section-sub" style="margin:0 auto 48px">Start free and upgrade when you're ready.</p>
-  <div class="pricing-grid">
+  <p class="section-sub" style="margin:0 auto 48px">Join the waitlist free. Upgrade when you're ready to trade seriously.</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;max-width:900px;margin:0 auto;position:relative">
+
+    <!-- Free -->
     <div class="pricing-card">
       <div class="pricing-tier">Free</div>
       <div class="pricing-price">$0<span>/month</span></div>
-      <div class="pricing-desc">For traders getting started</div>
+      <div class="pricing-desc">Join the waitlist & get notified</div>
       <ul class="pricing-features">
-        <li>Sessions & kill zone timer</li>
-        <li>Confluence checklist</li>
-        <li>Trade journal (unlimited)</li>
-        <li>Live news calendar</li>
-        <li>1 signal preview per week</li>
-        <li class="locked">AI chart analyzer</li>
-        <li class="locked">Full signals with SL/TP</li>
-        <li class="locked">Live candle scanner</li>
-        <li class="locked">Email signal alerts</li>
+        <li>Early access notifications</li>
+        <li>Promotional offers & discounts</li>
+        <li>Trading tips newsletter</li>
+        <li class="locked">App access</li>
+        <li class="locked">Signals</li>
+        <li class="locked">AI analysis</li>
       </ul>
-      <a href="app/index.html" class="btn-secondary" style="display:block;text-align:center;text-decoration:none">Get Started Free</a>
+      <button onclick="document.getElementById('email-capture').scrollIntoView({behavior:'smooth'})" class="btn-secondary" style="display:block;text-align:center;width:100%;cursor:pointer;padding:12px;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text2);font-family:'Syne',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase">Join Waitlist</button>
     </div>
-    <div class="pricing-card featured">
+
+    <!-- Pro -->
+    <div class="pricing-card featured" style="position:relative">
+      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--bg);font-size:10px;padding:3px 14px;border-radius:20px;font-family:'Space Mono',monospace;letter-spacing:1px;white-space:nowrap;font-weight:700">MOST POPULAR</div>
       <div class="pricing-tier" style="color:var(--gold)">Pro</div>
       <div class="pricing-price" style="color:var(--gold2)">$19<span>/month</span></div>
       <div class="pricing-desc">For serious ICT traders</div>
       <ul class="pricing-features">
-        <li>Everything in Free</li>
+        <li>Full trading suite access</li>
+        <li>Live signals — entry, SL & TP</li>
         <li>AI chart analyzer</li>
-        <li>Full signals with entry, SL & TP</li>
         <li>Live candle scanner</li>
+        <li>Trade journal & cloud sync</li>
         <li>Email signal alerts</li>
-        <li>Annotation log with cloud sync</li>
-        <li>Priority support</li>
+        <li>Confluence checklist</li>
+        <li>Live news calendar</li>
       </ul>
-      <a href="app/index.html" class="btn-primary" style="display:block;text-align:center;text-decoration:none">Upgrade to Pro</a>
+      <button onclick="document.getElementById('email-capture').scrollIntoView({behavior:'smooth'})" class="btn-primary" style="display:block;width:100%;cursor:pointer;padding:12px;border-radius:4px;font-family:'Syne',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase">Get Pro Access</button>
     </div>
+
+    <!-- Max -->
+    <div class="pricing-card" style="border-color:rgba(167,139,250,0.3);background:rgba(167,139,250,0.03)">
+      <div class="pricing-tier" style="color:#a78bfa">Max</div>
+      <div class="pricing-price" style="color:#c4b5fd">$49<span>/month</span></div>
+      <div class="pricing-desc">For professional traders</div>
+      <ul class="pricing-features">
+        <li>Everything in Pro</li>
+        <li>Priority signal alerts</li>
+        <li>Weekly AI trade review</li>
+        <li>1-on-1 signal explanations</li>
+        <li>Private community access</li>
+        <li>Early feature access</li>
+        <li>Direct analyst access</li>
+      </ul>
+      <button onclick="document.getElementById('email-capture').scrollIntoView({behavior:'smooth'})" style="display:block;width:100%;cursor:pointer;padding:12px;background:rgba(167,139,250,0.1);border:1px solid rgba(167,139,250,0.4);border-radius:4px;color:#a78bfa;font-family:'Syne',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s">Go Max</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- EMAIL CAPTURE -->
+<section id="email-capture" style="padding:80px 40px;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div style="max-width:520px;margin:0 auto;text-align:center">
+    <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-family:'Space Mono',monospace;margin-bottom:12px">Early Access</div>
+    <h2 style="font-size:clamp(24px,4vw,36px);font-weight:800;margin-bottom:12px;letter-spacing:-0.5px">Get notified when we launch</h2>
+    <p style="font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:32px">Join the waitlist and be first to know about launch offers, discounts and trading insights from the desk.</p>
+    <div style="display:flex;gap:10px;max-width:440px;margin:0 auto" id="email-form">
+      <input type="email" id="lead-email" placeholder="your@email.com" style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text);padding:12px 16px;font-family:'Syne',sans-serif;font-size:14px;outline:none" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border2)'" onkeydown="if(event.key==='Enter')submitLead()">
+      <button onclick="submitLead()" id="lead-btn" style="background:var(--gold3);border:1px solid var(--gold);color:var(--gold2);padding:12px 24px;border-radius:4px;font-family:'Syne',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:all 0.2s" onmouseover="this.style.background='var(--gold)';this.style.color='var(--bg)'" onmouseout="this.style.background='var(--gold3)';this.style.color='var(--gold2)'">Join Waitlist</button>
+    </div>
+    <div id="lead-msg" style="margin-top:14px;font-size:13px;min-height:20px"></div>
+    <p style="font-size:11px;color:var(--text3);margin-top:16px">No spam. Unsubscribe anytime.</p>
   </div>
 </section>
 
@@ -277,7 +315,7 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:32px 40p
   <div class="section-tag" style="display:inline-block;margin-bottom:16px">Ready to start?</div>
   <h2 class="section-title">Build your edge today</h2>
   <p style="font-size:16px;color:var(--text2);max-width:480px;margin:0 auto 32px;line-height:1.7">Join traders using ICT Desk to execute cleaner, more disciplined setups every session.</p>
-  <a href="app/index.html" class="btn-primary">Open ICT Desk Free</a>
+  <button onclick="document.getElementById('email-capture').scrollIntoView({behavior:'smooth'})" class="btn-primary" style="cursor:pointer">Get Early Access</button>
 </section>
 
 <footer>
@@ -285,10 +323,68 @@ footer{background:var(--bg2);border-top:1px solid var(--border);padding:32px 40p
   <div class="footer-links">
     <a href="#features">Features</a>
     <a href="#pricing">Pricing</a>
-    <a href="app/index.html">App</a>
+    <a href="#email-capture">Join Waitlist</a>
   </div>
   <div style="font-size:12px;color:var(--text3)">© 2026 ICT Desk. For educational purposes only.</div>
 </footer>
+
+<script>
+const SUPABASE_URL = 'https://rqtryeukepkwxalawfej.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxdHJ5ZXVrZXBrd3hhbGF3ZmVqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY4NTQ2OTksImV4cCI6MjA5MjQzMDY5OX0.2aB6quISfMDcrRJnHgdH8u9KN0tyCeWFtrs9MAyXP5A';
+
+async function submitLead() {
+  const emailInput = document.getElementById('lead-email');
+  const btn = document.getElementById('lead-btn');
+  const msg = document.getElementById('lead-msg');
+  const email = emailInput.value.trim();
+
+  if (!email || !email.includes('@')) {
+    msg.style.color = '#e05555';
+    msg.textContent = 'Please enter a valid email address';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Joining...';
+  msg.textContent = '';
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/email_leads`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ email, source: 'landing' })
+    });
+
+    if (res.ok || res.status === 409) {
+      // 409 = already exists, still show success
+      document.getElementById('email-form').innerHTML = `
+        <div style="width:100%;text-align:center;padding:16px;background:rgba(61,187,122,0.08);border:1px solid rgba(61,187,122,0.2);border-radius:6px">
+          <div style="font-size:20px;margin-bottom:8px">✓</div>
+          <div style="font-size:14px;color:#3dbb7a;font-weight:700">You're on the list!</div>
+          <div style="font-size:12px;color:#8b92a8;margin-top:4px">We'll notify you with early access and launch offers.</div>
+        </div>`;
+      // Also send welcome email via our API
+      fetch('/api/welcome-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      }).catch(() => {});
+    } else {
+      throw new Error('Failed to save');
+    }
+  } catch(e) {
+    msg.style.color = '#e05555';
+    msg.textContent = 'Something went wrong — please try again';
+    btn.disabled = false;
+    btn.textContent = 'Join Waitlist';
+  }
+}
+</script>
 
 </body>
 </html>
